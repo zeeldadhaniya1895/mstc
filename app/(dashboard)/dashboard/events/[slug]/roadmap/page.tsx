@@ -18,29 +18,56 @@ export default async function UserRoadmapPage({ params }: { params: Promise<{ sl
 
     if (!event) return notFound();
 
-    // 1. Get Roadmap Content
-    // For now, naive assumption: There is ONE main roadmap domain or we just pick the first one.
-    // In future: Users might select their "Track" (Web/App/AIML). 
-    // Fallback: Pick the first roadmap found for this event.
-    const roadmap = await db.query.roadmaps.findFirst({
-        where: eq(roadmaps.eventId, event.id)
-    });
-
-    if (!roadmap) {
-        return (
-            <div className="p-12 text-center text-gray-500">
-                <h1 className="text-2xl font-bold mb-2">{event.title} Roadmap</h1>
-                <p>No roadmap has been published for this event yet.</p>
-            </div>
-        );
-    }
-
-    // 2. Get User's Registration (to link checkpoints)
+    // 1. Get User's Registration FIRST
     const registration = await db.query.registrations.findFirst({
         where: and(
             eq(registrations.userId, session.user.id),
             eq(registrations.eventId, event.id)
         )
+    });
+
+    if (!registration) return redirect(`/dashboard/events/${slug}`);
+
+    // 2. Determine which roadmap to show
+    let roadmapQuery = eq(roadmaps.eventId, event.id);
+
+    // For mentorship, strict filtering by assigned domain
+    if (event.type === 'mentorship') {
+        if (!registration.assignedDomain) {
+            return (
+                <div className="max-w-2xl mx-auto py-12 text-center space-y-6">
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-8">
+                        <h1 className="text-2xl font-bold text-yellow-500 mb-2">Pending Domain Assignment</h1>
+                        <p className="text-gray-400">
+                            Your domain has not been assigned by the admins yet.
+                            Please check back later.
+                        </p>
+                    </div>
+
+                    {registration.domainPriorities && (
+                        <div className="text-left bg-white/5 rounded-xl p-6 border border-white/10">
+                            <h3 className="font-semibold mb-4 text-gray-400">Your Priorities</h3>
+                            <div className="space-y-2">
+                                {(registration.domainPriorities as string[]).map((p, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <Badge variant="outline" className="size-6 flex items-center justify-center rounded-full">
+                                            {i + 1}
+                                        </Badge>
+                                        <span>{p}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        // Filter by assigned domain
+        roadmapQuery = and(eq(roadmaps.eventId, event.id), eq(roadmaps.domain, registration.assignedDomain)) as any;
+    }
+
+    const roadmap = await db.query.roadmaps.findFirst({
+        where: roadmapQuery
     });
 
     if (!registration) return redirect(`/dashboard/events/${slug}`); // Redirect to details if not registered

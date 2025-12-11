@@ -5,7 +5,7 @@ import { type AdapterAccount } from "next-auth/adapters"
 
 // Enums
 export const roleEnum = pgEnum('role', ['student', 'member', 'core_member', 'deputy_convener', 'convener']);
-export const eventTypeEnum = pgEnum('event_type', ['hackathon', 'cp_solo', 'cp_team', 'mentorship']);
+export const eventTypeEnum = pgEnum('event_type', ['hackathon', 'cp_solo', 'cp_team', 'mentorship', 'team_event', 'solo_event']);
 export const eventStatusEnum = pgEnum('event_status', ['upcoming', 'live', 'past']);
 
 // Users Table
@@ -65,9 +65,12 @@ export const events = pgTable('events', {
     posterUrl: text('poster_url'),
     startDate: timestamp('start_date'),
     endDate: timestamp('end_date'),
+    registrationStartDate: timestamp('registration_start_date'),
+    registrationEndDate: timestamp('registration_end_date'),
     config: jsonb('config').$type<{
         maxTeamSize?: number;
         registrationFields?: Array<{ name: string; label: string; type: string; }>;
+        availableDomains?: string[];
     }>(),
     createdAt: timestamp('created_at').defaultNow(),
 });
@@ -89,6 +92,8 @@ export const registrations = pgTable('registrations', {
     eventId: uuid('event_id').references(() => events.id).notNull(),
     teamId: uuid('team_id').references(() => teams.id),
     customAnswers: jsonb('custom_answers'),
+    domainPriorities: jsonb('domain_priorities').$type<string[]>(), // Top 3 choices
+    assignedDomain: text('assigned_domain'), // Admin assigned domain
     status: text('status').default('pending'),
     createdAt: timestamp('created_at').defaultNow(),
 }, (t) => ({

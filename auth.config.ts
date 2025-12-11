@@ -4,8 +4,12 @@ import type { NextAuthConfig } from "next-auth"
 
 export default {
     providers: [
-        GitHub,
-        Google,
+        GitHub({
+            allowDangerousEmailAccountLinking: true,
+        }),
+        Google({
+            allowDangerousEmailAccountLinking: true,
+        }),
     ],
     pages: {
         signIn: '/login',

@@ -2,7 +2,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { registrations, teams, events } from '@/db/schema'; // Added events
+import { registrations, teams, events, users } from '@/db/schema'; // Added events, users
 import { eq, and } from 'drizzle-orm'; // Added eq, and
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
@@ -16,7 +16,7 @@ export async function registerForEvent(prevState: any, formData: FormData) {
     }
 
     const eventId = formData.get('eventId') as string;
-    const teamMode = formData.get('teamMode') as 'create' | 'join';
+    const teamMode = formData.get('teamMode') as 'create' | 'join' | 'solo';
     const rawData = Object.fromEntries(formData.entries());
 
     // 1. Check if Event Exists & Get Config (for maxTeamSize)
@@ -68,6 +68,24 @@ export async function registerForEvent(prevState: any, formData: FormData) {
             teamId = team.id;
             finalMessage = `Joined team "${team.name}" successfully!`;
 
+            teamId = team.id;
+            finalMessage = `Joined team "${team.name}" successfully!`;
+
+        } else if (teamMode === 'solo') {
+            // --- SOLO REGISTRATION (Auto-create team) ---
+            const teamName = session.user.name || 'Solo Participant';
+            const teamCode = nanoid(6).toUpperCase();
+
+            const [newTeam] = await db.insert(teams).values({
+                name: teamName,
+                joinCode: teamCode,
+                eventId: eventId,
+                createdBy: session.user.id,
+            }).returning();
+
+            teamId = newTeam.id;
+            finalMessage = 'Registration Successful!';
+
         } else {
             // --- CREATE NEW TEAM ---
             const teamName = formData.get('teamName') as string || `${session.user.name}'s Team`;
@@ -93,12 +111,22 @@ export async function registerForEvent(prevState: any, formData: FormData) {
         delete submissionData.teamName;
         delete submissionData.joinCode;
         delete submissionData.$ACTION_REF_1;
+        delete submissionData.priority_1;
+        delete submissionData.priority_2;
+        delete submissionData.priority_3;
+
+        // Extract Priorities
+        const priorities = [];
+        if (formData.get('priority_1')) priorities.push(formData.get('priority_1') as string);
+        if (formData.get('priority_2')) priorities.push(formData.get('priority_2') as string);
+        if (formData.get('priority_3')) priorities.push(formData.get('priority_3') as string);
 
         await db.insert(registrations).values({
             userId: session.user.id,
             eventId: eventId,
             teamId: teamId,
             customAnswers: submissionData,
+            domainPriorities: priorities.length > 0 ? priorities : null, // Save priorities
             status: 'pending',
         });
 
@@ -109,4 +137,29 @@ export async function registerForEvent(prevState: any, formData: FormData) {
 
     revalidatePath(`/dashboard/events`);
     return { message: finalMessage, success: true };
+}
+
+export async function assignDomain(registrationId: string, domain: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { message: 'Unauthorized', success: false };
+
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, session.user.id)
+    });
+
+    if (!user || !['convener', 'deputy_convener', 'core_member', 'member'].includes(user.role || '')) {
+        return { message: 'Unauthorized', success: false };
+    }
+
+    try {
+        await db.update(registrations)
+            .set({ assignedDomain: domain })
+            .where(eq(registrations.id, registrationId));
+
+        revalidatePath('/admin/events');
+        return { message: `Assigned to ${domain}`, success: true };
+    } catch (e) {
+        console.error(e);
+        return { message: 'Failed to assign domain', success: false };
+    }
 }

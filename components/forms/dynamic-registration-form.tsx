@@ -22,7 +22,7 @@ export default function DynamicRegistrationForm({ config, eventId }: { config: a
     // sticking to native form action is easier with server actions unless we need complex client validation.
     // For simplicity with dynamic fields, let's use native inputs with names corresponding to fields.
 
-    const [teamMode, setTeamMode] = useState<'create' | 'join'>('create');
+    const [teamMode, setTeamMode] = useState<'create' | 'join' | 'solo'>(config?.maxTeamSize === 1 ? 'solo' : 'create');
 
     if (!config?.registrationFields) return <div>No registration fields configured.</div>;
 
@@ -31,7 +31,7 @@ export default function DynamicRegistrationForm({ config, eventId }: { config: a
             <div className="p-6 bg-green-500/10 text-green-400 border border-green-500/20 rounded-xl text-center backdrop-blur-sm">
                 <h3 className="text-xl font-bold mb-2">Registration Successful!</h3>
                 <p className="opacity-80">{state.message}</p>
-                {/* We should probably show the Team Code here if they created one */}
+                {teamMode === 'create' && <p className="text-sm mt-2 text-cyan-400">Share your Team Code with others!</p>}
             </div>
         )
     }
@@ -41,41 +41,71 @@ export default function DynamicRegistrationForm({ config, eventId }: { config: a
             <input type="hidden" name="eventId" value={eventId} />
             <input type="hidden" name="teamMode" value={teamMode} />
 
-            {/* Team Section */}
-            <div className="space-y-4 p-5 bg-white/5 border border-white/10 rounded-xl">
-                <h3 className="text-lg font-semibold text-white">Team Formation</h3>
+            {/* Team Section - Hide if Solo */}
+            {config.maxTeamSize > 1 ? (
+                <div className="space-y-4 p-5 bg-white/5 border border-white/10 rounded-xl">
+                    <h3 className="text-lg font-semibold text-white">Team Formation</h3>
 
-                <div className="flex gap-2 p-1 bg-black/40 rounded-lg">
-                    <button
-                        type="button"
-                        onClick={() => setTeamMode('create')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${teamMode === 'create' ? 'bg-cyan-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                    >
-                        Create New Team
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setTeamMode('join')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${teamMode === 'join' ? 'bg-purple-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                    >
-                        Join Existing Team
-                    </button>
+                    <div className="flex gap-2 p-1 bg-black/40 rounded-lg">
+                        <button
+                            type="button"
+                            onClick={() => setTeamMode('create')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${teamMode === 'create' ? 'bg-cyan-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        >
+                            Create New Team
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setTeamMode('join')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${teamMode === 'join' ? 'bg-purple-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        >
+                            Join Existing Team
+                        </button>
+                    </div>
+
+                    {teamMode === 'create' ? (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                            <Label>Team Name</Label>
+                            <Input name="teamName" placeholder="e.g. The Algo Wizards" className="bg-black/20" required={teamMode === 'create'} />
+                            <p className="text-xs text-gray-400">You will get a unique join code to share with your teammates.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                            <Label>Join Code</Label>
+                            <Input name="joinCode" placeholder="Enter 6-character code" className="bg-black/20 font-mono uppercase" maxLength={6} required={teamMode === 'join'} />
+                            <p className="text-xs text-gray-400">Ask your team leader for the code.</p>
+                        </div>
+                    )}
                 </div>
+            ) : (
+                <div className="p-4 bg-cyan-500/5 text-cyan-400 border border-cyan-500/20 rounded-xl text-center text-sm">
+                    Individual Registration
+                </div>
+            )}
 
-                {teamMode === 'create' ? (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                        <Label>Team Name</Label>
-                        <Input name="teamName" placeholder="e.g. The Algo Wizards" className="bg-black/20" required={teamMode === 'create'} />
-                        <p className="text-xs text-gray-400">You will get a unique join code to share with your teammates.</p>
-                    </div>
-                ) : (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                        <Label>Join Code</Label>
-                        <Input name="joinCode" placeholder="Enter 6-character code" className="bg-black/20 font-mono uppercase" maxLength={6} required={teamMode === 'join'} />
-                        <p className="text-xs text-gray-400">Ask your team leader for the code.</p>
-                    </div>
-                )}
-            </div>
+            {/* Domain Preferences (WoC) */}
+            {config.availableDomains && config.availableDomains.length > 0 && (
+                <div className="space-y-4 p-5 bg-cyan-900/10 border border-cyan-500/20 rounded-xl">
+                    <h3 className="text-lg font-semibold text-cyan-400">Domain Preferences</h3>
+                    <p className="text-sm text-gray-400">Select your top 3 choices. Admins will assign you one based on your profile.</p>
+
+                    {[1, 2, 3].map((rank) => (
+                        <div key={rank} className="space-y-2">
+                            <Label>Priority {rank}</Label>
+                            <select
+                                name={`priority_${rank}`}
+                                className="w-full h-10 px-3 bg-black/20 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                                required={rank === 1} // Only 1st is mandatory? Or all? Let's make 1st mandatory.
+                            >
+                                <option value="">Select Domain...</option>
+                                {config.availableDomains.map((domain: string) => (
+                                    <option key={domain} value={domain}>{domain}</option>
+                                ))}
+                            </select>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Dynamic Fields Section */}
             <div className="space-y-4">

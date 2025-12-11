@@ -64,6 +64,11 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
                             <Trophy className="size-4" /> Awards
                         </Button>
                     </Link>
+                    <Link href={`/admin/events/${id}/registrations`}>
+                        <Button className="gap-2 bg-cyan-600 hover:bg-cyan-700">
+                            Manage Participants
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
