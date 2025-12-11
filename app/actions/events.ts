@@ -4,6 +4,7 @@
 import { db } from '@/lib/db';
 import { events, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { auth } from '@/auth'; // Added import
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 

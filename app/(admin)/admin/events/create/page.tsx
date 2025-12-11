@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormBuilder, FormField } from '@/components/admin/form-builder';
 import { createEvent } from '@/app/actions/events';
-import { useFormStatus, useFormState } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -21,7 +21,7 @@ const initialState = {
 export default function CreateEventPage() {
     const [fields, setFields] = useState<FormField[]>([]);
     const [maxTeamSize, setMaxTeamSize] = useState(4);
-    const [state, formAction] = useFormState(createEvent, initialState);
+    const [state, formAction] = useActionState(createEvent, initialState);
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -57,8 +57,11 @@ export default function CreateEventPage() {
                             type="number"
                             min={1}
                             max={10}
-                            value={maxTeamSize}
-                            onChange={(e) => setMaxTeamSize(parseInt(e.target.value))}
+                            value={isNaN(maxTeamSize) ? '' : maxTeamSize}
+                            onChange={(e) => {
+                                const val = parseInt(e.target.value);
+                                setMaxTeamSize(isNaN(val) ? 0 : val);
+                            }}
                             placeholder="4"
                         />
                         <p className="text-xs text-gray-400">Set to 1 for individual events.</p>

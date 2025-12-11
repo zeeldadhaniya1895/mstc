@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { events, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { auth } from '@/auth';
 
 export async function updateEventSettings(eventId: string, formData: FormData) {
     const status = formData.get('status') as any;
@@ -12,7 +13,11 @@ export async function updateEventSettings(eventId: string, formData: FormData) {
     const endDate = formData.get('endDate') ? new Date(formData.get('endDate') as string) : null;
     const posterUrl = formData.get('posterUrl') as string;
 
-    // We don't verify Auth here for brevity, but in prod we should check admin role again.
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return { message: 'Unauthorized', success: false };
+    }
 
     const user = await db.query.users.findFirst({
         where: eq(users.id, session.user.id),

@@ -166,21 +166,7 @@ export default async function ProfilePage() {
                         </CardContent>
                     </Card>
 
-                    {/* Achievement Placeholder */}
-                    <Card className="bg-gradient-to-br from-yellow-900/20 to-black border-yellow-500/20">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-yellow-500 flex items-center gap-2">
-                                <Trophy className="size-4" /> Next Milestone
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-white mb-1">Level 2</div>
-                            <div className="w-full bg-white/10 h-1.5 rounded-full mt-2">
-                                <div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: '45%' }} />
-                            </div>
-                            <p className="text-xs text-gray-500 mt-2">450 / 1000 XP</p>
-                        </CardContent>
-                    </Card>
+
                 </div>
             </div>
         </div>
