@@ -17,6 +17,9 @@ export const users = pgTable('user', {
     image: text("image"),
     role: roleEnum('role').default('student'),
     collegeId: text('college_id'),
+    bio: text('bio'),
+    githubId: text('github_id'),
+    linkedinId: text('linkedin_id'),
     xpPoints: integer('xp_points').default(0),
     createdAt: timestamp('created_at').defaultNow(),
 });
@@ -166,8 +169,26 @@ export const registrationsRelations = relations(registrations, ({ one, many }) =
         references: [events.id],
     }),
 }));
+// Legacy Notes Table
+export const legacyNotes = pgTable('legacy_notes', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    content: text('content').notNull(),
+    role: roleEnum('role').notNull(), // Snapshot of role at time of writing
+    tenure: text('tenure').notNull(), // e.g. "2023-2024"
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
     registrations: many(registrations),
+    legacyNotes: many(legacyNotes),
+}));
+
+export const legacyNotesRelations = relations(legacyNotes, ({ one }) => ({
+    user: one(users, {
+        fields: [legacyNotes.userId],
+        references: [users.id],
+    }),
 }));
 
 export const checkpointsRelations = relations(checkpoints, ({ one }) => ({

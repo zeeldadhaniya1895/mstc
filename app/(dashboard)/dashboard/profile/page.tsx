@@ -7,9 +7,10 @@ import { redirect } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Calendar, Activity, Medal, Star } from 'lucide-react';
+import { Trophy, Calendar, Activity, Medal, Star, Github, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { EditProfileDialog } from '@/components/profile/edit-profile-dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +66,10 @@ export default async function ProfilePage() {
     return (
         <div className="max-w-5xl mx-auto space-y-8">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-900/40 to-cyan-900/20 rounded-2xl p-4 md:p-8 border border-white/10 flex flex-col md:flex-row items-center gap-4 md:gap-8">
+            <div className="bg-gradient-to-r from-blue-900/40 to-cyan-900/20 rounded-2xl p-4 md:p-8 border border-white/10 flex flex-col md:flex-row items-center gap-4 md:gap-8 relative">
+                <div className="absolute top-4 right-4">
+                    <EditProfileDialog user={user} />
+                </div>
                 <Avatar className="size-24 md:size-32 border-4 border-cyan-500/30">
                     <AvatarImage src={user.image || ''} />
                     <AvatarFallback className="text-4xl font-bold bg-cyan-950 text-cyan-400">
@@ -78,6 +82,21 @@ export default async function ProfilePage() {
                         <Badge variant="secondary" className="capitalize border-cyan-500/30 text-cyan-400">{user.role}</Badge>
                     </div>
                     <p className="text-gray-400 text-sm md:text-base">{user.email}</p>
+                    {user.bio && <p className="text-sm text-gray-300 max-w-lg italic">"{user.bio}"</p>}
+
+                    <div className="flex gap-4 justify-center md:justify-start pt-2">
+                        {user.githubId && (
+                            <a href={user.githubId.startsWith('http') ? user.githubId : `https://github.com/${user.githubId}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                <Github className="size-5" />
+                            </a>
+                        )}
+                        {user.linkedinId && (
+                            <a href={user.linkedinId.startsWith('http') ? user.linkedinId : `https://linkedin.com/in/${user.linkedinId}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                <Linkedin className="size-5" />
+                            </a>
+                        )}
+                    </div>
+
                     <p className="text-xs text-gray-500">Joined {new Date(user.createdAt!).toLocaleDateString()}</p>
                 </div>
                 {/* Quick Stats on Hero */}

@@ -4,14 +4,14 @@
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, LayoutDashboard, Users, Trophy, Settings, LogOut, Terminal } from 'lucide-react';
+import { Calendar, LayoutDashboard, Users, Settings, Trophy, LogOut, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
     { name: 'Overview', href: '/admin', icon: LayoutDashboard },
     { name: 'Events', href: '/admin/events', icon: Calendar },
     { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Leaderboards', href: '/admin/leaderboards', icon: Trophy },
+    { name: 'Legacy', href: '/admin/legacy', icon: Trophy }, // Using Trophy for Legacy/History
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
