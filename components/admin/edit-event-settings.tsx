@@ -67,6 +67,14 @@ export function EditEventSettings({ event }: { event: any }) {
                     <Label>End Date</Label>
                     <Input type="datetime-local" name="endDate" defaultValue={formatDate(event.endDate)} className="bg-black/20" />
                 </div>
+                <div className="space-y-2">
+                    <Label>Registration Start Date</Label>
+                    <Input type="datetime-local" name="registrationStartDate" defaultValue={formatDate(event.registrationStartDate)} className="bg-black/20" />
+                </div>
+                <div className="space-y-2">
+                    <Label>Registration End Date</Label>
+                    <Input type="datetime-local" name="registrationEndDate" defaultValue={formatDate(event.registrationEndDate)} className="bg-black/20" />
+                </div>
             </div>
         </form>
     );

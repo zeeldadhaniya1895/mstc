@@ -11,6 +11,8 @@ export async function updateEventSettings(eventId: string, formData: FormData) {
     const status = formData.get('status') as any;
     const startDate = formData.get('startDate') ? new Date(formData.get('startDate') as string) : null;
     const endDate = formData.get('endDate') ? new Date(formData.get('endDate') as string) : null;
+    const registrationStartDate = formData.get('registrationStartDate') ? new Date(formData.get('registrationStartDate') as string) : null;
+    const registrationEndDate = formData.get('registrationEndDate') ? new Date(formData.get('registrationEndDate') as string) : null;
     const posterUrl = formData.get('posterUrl') as string;
 
     const session = await auth();
@@ -33,6 +35,8 @@ export async function updateEventSettings(eventId: string, formData: FormData) {
                 status,
                 startDate,
                 endDate,
+                registrationStartDate,
+                registrationEndDate,
                 posterUrl
             })
             .where(eq(events.id, eventId));

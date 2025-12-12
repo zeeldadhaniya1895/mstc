@@ -168,13 +168,43 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                         ) : (
                             <>
                                 <h3 className="text-xl font-bold mb-6">Register Now</h3>
-                                {event.status === 'upcoming' || event.status === 'live' ? (
-                                    <DynamicRegistrationForm config={event.config} eventId={event.id} />
-                                ) : (
-                                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded text-center text-red-400">
-                                        Registrations Closed
-                                    </div>
-                                )}
+                                {(() => {
+                                    const now = new Date();
+                                    const regStart = event.registrationStartDate ? new Date(event.registrationStartDate) : null;
+                                    const regEnd = event.registrationEndDate ? new Date(event.registrationEndDate) : null;
+
+                                    if (event.status === 'past') {
+                                        return (
+                                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded text-center text-red-400">
+                                                Event Completed
+                                            </div>
+                                        );
+                                    }
+
+                                    if (regStart && now < regStart) {
+                                        return (
+                                            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded text-center text-yellow-400">
+                                                Registrations open on {regStart.toLocaleDateString()} at {regStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.
+                                            </div>
+                                        );
+                                    }
+
+                                    if (regEnd && now > regEnd) {
+                                        return (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded text-center text-red-400">
+                                                    Registrations Closed
+                                                </div>
+                                                <div className="text-sm text-gray-400 text-center">
+                                                    Missed the deadline? Contact <a href="mailto:microsoftclub@dau.ac.in" className="text-cyan-400 hover:underline">microsoftclub@dau.ac.in</a> to request registration.
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+
+                                    // Default: Open
+                                    return <DynamicRegistrationForm config={event.config} eventId={event.id} />;
+                                })()}
                                 <p className="text-xs text-gray-500 mt-6 text-center">
                                     By registering, you agree to the MSTC Code of Conduct.
                                 </p>

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Save, ChevronRight, ChevronDown } from 'lucide-react';
 import { saveRoadmap, deleteRoadmapDomain } from '@/app/actions/roadmaps';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface Task {
     id: string;
@@ -29,6 +30,11 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
     // Local state for the "Active" domain being edited
     const [domains, setDomains] = useState<any[]>(initialRoadmaps);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        setDomains(initialRoadmaps);
+    }, [initialRoadmaps]);
 
     // Editing State
     const [activeDomain, setActiveDomain] = useState<string>('');
@@ -46,6 +52,25 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
         setWeeks([{ id: 1, title: 'Week 1', tasks: [] }]); // Start with Week 1
     };
 
+    const handleDeleteDomain = async (e: React.MouseEvent, roadmapId: string, domainName: string) => {
+        e.stopPropagation();
+        if (!confirm(`Are you sure you want to delete the "${domainName}" roadmap? This cannot be undone.`)) return;
+
+        const res = await deleteRoadmapDomain(roadmapId);
+        if (res.success) {
+            toast.success(res.message);
+            router.refresh();
+            const newDomains = domains.filter(d => d.id !== roadmapId);
+            setDomains(newDomains);
+            if (activeDomain === domainName) {
+                setActiveDomain('');
+                setWeeks([]);
+            }
+        } else {
+            toast.error(res.message);
+        }
+    };
+
     const handleSave = async () => {
         if (!activeDomain) return;
         setLoading(true);
@@ -53,12 +78,7 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
         setLoading(false);
         if (res.success) {
             toast.success(res.message);
-            // Update local list basics
-            const exists = domains.find(d => d.domain === activeDomain);
-            if (!exists) {
-                setDomains([...domains, { domain: activeDomain, content: weeks }]); // pseudo update
-                // Real update happens via revalidatePath, but client needs feedback
-            }
+            router.refresh();
         } else {
             toast.error(res.message);
         }
@@ -68,12 +88,29 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
         setWeeks([...weeks, { id: weeks.length + 1, title: `Week ${weeks.length + 1}`, tasks: [] }]);
     };
 
+    const deleteWeek = (weekId: number) => {
+        if (!confirm('Delete this week and all its tasks?')) return;
+        setWeeks(weeks.filter(w => w.id !== weekId));
+    };
+
     const addTask = (weekId: number) => {
         setWeeks(weeks.map(w => {
             if (w.id === weekId) {
                 return {
                     ...w,
                     tasks: [...w.tasks, { id: crypto.randomUUID(), title: '', description: '' }]
+                };
+            }
+            return w;
+        }));
+    };
+
+    const deleteTask = (weekId: number, taskId: string) => {
+        setWeeks(weeks.map(w => {
+            if (w.id === weekId) {
+                return {
+                    ...w,
+                    tasks: w.tasks.filter(t => t.id !== taskId)
                 };
             }
             return w;
@@ -105,10 +142,20 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
                         <div
                             key={idx}
                             onClick={() => handleSelectDomain(r)}
-                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${activeDomain === r.domain ? 'bg-cyan-500/20 border-cyan-500' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+                            className={`p-3 rounded-lg border cursor-pointer transition-colors group flex justify-between items-start ${activeDomain === r.domain ? 'bg-cyan-500/20 border-cyan-500' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
                         >
-                            <div className="font-medium">{r.domain}</div>
-                            <div className="text-xs text-gray-500">{Array.isArray(r.content) ? r.content.length : 0} Weeks</div>
+                            <div>
+                                <div className="font-medium">{r.domain}</div>
+                                <div className="text-xs text-gray-500">{Array.isArray(r.content) ? r.content.length : 0} Weeks</div>
+                            </div>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => handleDeleteDomain(e, r.id, r.domain)}
+                            >
+                                <Trash2 className="size-3" />
+                            </Button>
                         </div>
                     ))}
                     {activeDomain && !domains.find(d => d.domain === activeDomain) && (
@@ -138,12 +185,20 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
                         <div className="space-y-6">
                             {weeks.map((week, idx) => (
                                 <Card key={week.id} className="bg-black/20 border-white/10">
-                                    <CardHeader className="py-4">
+                                    <CardHeader className="py-4 flex flex-row justify-between items-center">
                                         <CardTitle className="text-lg font-medium text-cyan-400">{week.title}</CardTitle>
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-8 w-8 text-gray-500 hover:text-red-400"
+                                            onClick={() => deleteWeek(week.id)}
+                                        >
+                                            <Trash2 className="size-4" />
+                                        </Button>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {week.tasks.map((task, tIdx) => (
-                                            <div key={task.id} className="flex gap-4 items-start p-3 bg-white/5 rounded-md">
+                                            <div key={task.id} className="flex gap-4 items-start p-3 bg-white/5 rounded-md group">
                                                 <div className="flex-1 space-y-2">
                                                     <Input
                                                         placeholder="Task Title (e.g. Learn React Basics)"
@@ -159,6 +214,14 @@ export default function RoadmapBuilder({ eventId, initialRoadmaps }: { eventId: 
                                                         rows={2}
                                                     />
                                                 </div>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => deleteTask(week.id, task.id)}
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </Button>
                                             </div>
                                         ))}
                                         <Button onClick={() => addTask(week.id)} variant="ghost" size="sm" className="text-gray-400 hover:text-white">
