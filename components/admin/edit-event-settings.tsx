@@ -8,9 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { updateEventSettings } from '@/app/actions/event-settings';
 import { toast } from 'sonner';
+import { RichTextEditor } from './rich-text-editor';
+import { EVENT_THEME_CONFIG } from '@/lib/themes-config';
+import { Palette } from 'lucide-react';
 
 export function EditEventSettings({ event }: { event: any }) {
     const [loading, setLoading] = useState(false);
+    const [description, setDescription] = useState(event.description || '');
+    const [rules, setRules] = useState(event.rules || '');
 
     async function handleSubmit(formData: FormData) {
         setLoading(true);
@@ -76,6 +81,46 @@ export function EditEventSettings({ event }: { event: any }) {
                     <Input type="datetime-local" name="registrationEndDate" defaultValue={formatDate(event.registrationEndDate)} className="bg-black/20" />
                 </div>
             </div>
-        </form>
+
+            <div className="space-y-4 pt-4 border-t border-white/10">
+                <div className="space-y-2">
+                    <Label>Event Theme</Label>
+                    <Select name="theme" defaultValue={event.theme || 'default'}>
+                        <SelectTrigger className="bg-black/20 focus:ring-cyan-500/20 transition-all">
+                            <div className="flex items-center gap-2">
+                                <Palette className="size-4 text-gray-500" />
+                                <SelectValue placeholder="Select theme..." />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {Object.entries(EVENT_THEME_CONFIG).map(([key, theme]) => (
+                                <SelectItem key={key} value={key}>{theme.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <RichTextEditor
+                        label="Event Description"
+                        placeholder="Describe your event..."
+                        value={description}
+                        onChange={setDescription}
+                    />
+                    <input type="hidden" name="description" value={description} />
+                </div>
+
+                <div className="space-y-2">
+                    <RichTextEditor
+                        label="Rules of Conduct"
+                        placeholder="List the rules and guidelines..."
+                        value={rules}
+                        onChange={setRules}
+                    />
+                    <input type="hidden" name="rules" value={rules} />
+                </div>
+            </div>
+
+        </form >
     );
 }

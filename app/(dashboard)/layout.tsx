@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div className="min-h-screen flex bg-[#0f0f0f] text-white font-sans">
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex w-64 border-r border-white/10 flex-col fixed h-full bg-[#141414]">
+            <aside className="hidden md:flex w-64 border-r border-white/10 flex-col fixed h-full bg-[#141414] z-50">
                 <DashboardSidebar />
             </aside>
 

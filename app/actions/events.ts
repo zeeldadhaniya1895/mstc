@@ -18,6 +18,9 @@ export async function createEvent(prevState: any, formData: FormData) {
     const registrationStartDate = formData.get('registrationStartDate') ? new Date(formData.get('registrationStartDate') as string) : null;
     const registrationEndDate = formData.get('registrationEndDate') ? new Date(formData.get('registrationEndDate') as string) : null;
     const posterUrl = formData.get('posterUrl') as string;
+    const theme = formData.get('theme') as string || 'default';
+    const description = formData.get('description') as string;
+    const rules = formData.get('rules') as string;
     const configRaw = formData.get('config') as string;
     const config = configRaw ? JSON.parse(configRaw) : {};
     const availableDomainsRaw = formData.get('availableDomains') as string;
@@ -41,6 +44,9 @@ export async function createEvent(prevState: any, formData: FormData) {
             type,
             status: 'upcoming',
             posterUrl,
+            theme,
+            description,
+            rules,
             startDate,
             endDate,
             registrationStartDate,

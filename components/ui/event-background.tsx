@@ -1,0 +1,188 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { EventThemeKey } from '@/lib/themes-config';
+import React from 'react';
+import { Github, GitBranch, GitCommit, GitPullRequest, Terminal, GitMerge } from 'lucide-react';
+
+const WinterBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#020617]">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] to-black opacity-80" />
+        {[...Array(20)].map((_, i) => (
+            <motion.div
+                key={i}
+                initial={{ y: -100, x: Math.random() * 1000 }}
+                animate={{ y: 1200, rotate: 360 }}
+                transition={{
+                    duration: 10 + Math.random() * 10,
+                    repeat: Infinity,
+                    delay: Math.random() * 5,
+                    ease: "linear"
+                }}
+                className="absolute text-cyan-200/20 text-xl"
+            >
+                ❄
+            </motion.div>
+        ))}
+    </div>
+);
+
+const HacktoberfestBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#150229]">
+        <div className="absolute inset-0 bg-noise opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+        {[...Array(15)].map((_, i) => (
+            <motion.div
+                key={i}
+                initial={{ y: 1000, x: Math.random() * 1500, opacity: 0 }}
+                animate={{ y: -200, opacity: [0, 0.8, 0] }}
+                transition={{
+                    duration: 10 + Math.random() * 10,
+                    repeat: Infinity,
+                    delay: Math.random() * 5,
+                    ease: "linear"
+                }}
+                className="absolute flex items-center justify-center text-purple-400/30 font-mono font-bold text-2xl"
+            >
+                {[
+                    '</>',
+                    '//',
+                    <GitPullRequest key="pr" className="size-8" />,
+                    <Terminal key="term" className="size-8" />,
+                    '{ }'
+                ][i % 5]}
+            </motion.div>
+        ))}
+    </div>
+);
+
+const GithubBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0d1117]">
+        <div className="absolute inset-0" style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+        }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-transparent to-transparent opacity-90" />
+        {[...Array(20)].map((_, i) => {
+            const Icon = [Github, GitBranch, GitCommit, GitPullRequest, Terminal, GitMerge][i % 6];
+            return (
+                <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0, rotate: 0 }}
+                    animate={{
+                        opacity: [0, 1.5, 1.5, 0],
+                        scale: [0.5, 1.2, 0.5],
+                        rotate: [0, 10, -10, 0]
+                    }}
+                    transition={{
+                        duration: 3 + Math.random() * 3,
+                        repeat: Infinity,
+                        delay: Math.random() * 3,
+                    }}
+                    className="absolute text-white/10"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                    }}
+                >
+                    <Icon className="size-8" />
+                </motion.div>
+            );
+        })}
+    </div>
+);
+
+const SummerBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#1c1004]">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+        {/* Fireflies */}
+        {[...Array(20)].map((_, i) => (
+            <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1.2, 0],
+                    y: [0, -50, -100],
+                    x: [0, Math.random() * 50 - 25, 0]
+                }}
+                transition={{
+                    duration: 2 + Math.random() * 4,
+                    repeat: Infinity,
+                    delay: Math.random() * 5,
+                    ease: "easeInOut"
+                }}
+                className="absolute size-1 bg-yellow-400 rounded-full blur-[1px] shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${50 + Math.random() * 50}%`,
+                }}
+            />
+        ))}
+    </div>
+);
+
+const CPBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-black">
+        <div className="absolute inset-0 flex justify-around opacity-20">
+            {[...Array(20)].map((_, i) => (
+                <motion.div
+                    key={i}
+                    initial={{ y: -1000 }}
+                    animate={{ y: 2000 }}
+                    transition={{
+                        duration: 5 + Math.random() * 10,
+                        repeat: Infinity,
+                        delay: Math.random() * 5,
+                        ease: "linear"
+                    }}
+                    className="w-[2px] h-[200px] bg-gradient-to-b from-transparent via-green-500 to-transparent"
+                />
+            ))}
+        </div>
+        {[...Array(10)].map((_, i) => (
+            <motion.div
+                key={i}
+                className="absolute flex items-center gap-2"
+                initial={{ x: Math.random() * 1000, y: Math.random() * 800, opacity: 0 }}
+                animate={{ opacity: [0, 0.8, 0], scale: [0.8, 1.2, 0.8] }}
+                transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 5 }}
+            >
+                <div className="size-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]" />
+                <div className="h-px w-10 bg-green-700/50" />
+                <div className="size-3 rounded-full bg-green-500/50" />
+            </motion.div>
+        ))}
+    </div>
+);
+
+const DefaultBackground = () => (
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#020617]">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-black to-black opacity-80" />
+        <div className="bg-noise opacity-20" />
+    </div>
+);
+
+const COMPONENTS: Record<EventThemeKey, React.FC> = {
+    default: DefaultBackground,
+    winter: WinterBackground,
+    hacktoberfest: HacktoberfestBackground,
+    github: GithubBackground,
+    summer: SummerBackground,
+    cp: CPBackground
+};
+
+
+export function EventBackground({ theme }: { theme: EventThemeKey }) {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    const Component = COMPONENTS[theme] || DefaultBackground;
+    return <Component />;
+}
+

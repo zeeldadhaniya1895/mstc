@@ -6,9 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormBuilder, FormField } from '@/components/admin/form-builder';
+import { RichTextEditor } from '@/components/admin/rich-text-editor';
 import { createEvent } from '@/app/actions/events';
 import { useFormStatus } from 'react-dom';
 import { StringListInput } from '@/components/ui/string-list-input';
+import { EVENT_THEME_CONFIG } from '@/lib/themes-config';
+import { Palette } from 'lucide-react';
 
 import {
     Calendar,
@@ -37,6 +40,8 @@ export default function CreateEventPage() {
     const [maxTeamSize, setMaxTeamSize] = useState(4);
     const [eventType, setEventType] = useState('team_event'); // Default to Team Event
     const [domains, setDomains] = useState<string[]>([]);
+    const [description, setDescription] = useState('');
+    const [rules, setRules] = useState('');
     const [state, formAction] = useActionState(createEvent, initialState);
 
     // Auto-set maxTeamSize for solo events
@@ -80,6 +85,23 @@ export default function CreateEventPage() {
                                 <LinkIcon className="absolute left-3 top-2.5 size-4 text-gray-500" />
                                 <Input name="slug" required placeholder="e.g. woc-2025" className="pl-10 bg-white/5 border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all" />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-300">Event Theme</label>
+                            <Select name="theme" defaultValue="default">
+                                <SelectTrigger className="bg-white/5 border-white/10 focus:ring-cyan-500/20 transition-all">
+                                    <div className="flex items-center gap-2">
+                                        <Palette className="size-4 text-gray-500" />
+                                        <SelectValue placeholder="Select theme..." />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.entries(EVENT_THEME_CONFIG).map(([key, theme]) => (
+                                        <SelectItem key={key} value={key}>{theme.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="space-y-2">
@@ -163,6 +185,35 @@ export default function CreateEventPage() {
                                 <Input type="url" name="posterUrl" placeholder="https://example.com/poster.jpg" className="pl-10 bg-white/5 border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/20 transition-all" />
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* Rich Text Fields */}
+                <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm shadow-xl">
+                    <div className="px-6 py-4 border-b border-white/10 bg-white/5">
+                        <h2 className="text-lg font-semibold flex items-center gap-2">
+                            <AlignLeft className="size-5 text-purple-400" />
+                            Event Content
+                        </h2>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        <RichTextEditor
+                            label="Event Description"
+                            placeholder="Describe your event..."
+                            value={description}
+                            onChange={setDescription}
+                        />
+                        <input type="hidden" name="description" value={description} />
+
+                        <div className="border-t border-white/10" />
+
+                        <RichTextEditor
+                            label="Rules of Conduct"
+                            placeholder="List the rules and guidelines..."
+                            value={rules}
+                            onChange={setRules}
+                        />
+                        <input type="hidden" name="rules" value={rules} />
                     </div>
                 </div>
 
