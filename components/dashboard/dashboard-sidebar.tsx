@@ -30,8 +30,8 @@ export function DashboardSidebar({ className, onNavigate }: { className?: string
     const { data: session, status } = useSession();
 
     return (
-        <div className={cn("flex flex-col h-full bg-[#141414] border-r border-white/10", className)}>
-            <div className="h-16 flex items-center px-6 border-b border-white/10 gap-2 shrink-0">
+        <div className={cn("flex flex-col h-full bg-[#202124] border-r border-[#5F6368]/20", className)}>
+            <div className="h-16 flex items-center px-6 border-b border-[#5F6368]/20 gap-2 shrink-0">
                 <Terminal className="text-cyan-400 size-6" />
                 <span className="font-bold text-lg tracking-tight">MSTC Student</span>
             </div>
@@ -41,7 +41,7 @@ export function DashboardSidebar({ className, onNavigate }: { className?: string
                     const isActive = pathname === item.href;
                     return (
                         <Link key={item.href} href={item.href} onClick={onNavigate}>
-                            <Button variant="ghost" className={cn("w-full justify-start gap-3", isActive ? "bg-white/10 text-white" : "text-gray-400 hover:text-white hover:bg-white/5")}>
+                            <Button variant="ghost" className={cn("w-full justify-start gap-3", isActive ? "bg-[#E8EAED]/10 text-[#E8EAED]" : "text-[#9AA0A6] hover:text-[#E8EAED] hover:bg-[#E8EAED]/5")}>
                                 <item.icon className="size-4" />
                                 {item.name}
                             </Button>
@@ -50,7 +50,7 @@ export function DashboardSidebar({ className, onNavigate }: { className?: string
                 })}
             </div>
 
-            <div className="p-4 border-t border-white/10 space-y-2 shrink-0">
+            <div className="p-4 border-t border-[#5F6368]/20 space-y-2 shrink-0">
                 {/* Admin Link for Non-Students */}
                 {status === 'authenticated' && session?.user && (session.user.role || 'student') !== 'student' && (
                     <Link href="/admin" onClick={onNavigate}>
@@ -61,7 +61,7 @@ export function DashboardSidebar({ className, onNavigate }: { className?: string
                 )}
 
                 <Link href="/" onClick={onNavigate}>
-                    <Button variant="ghost" className="w-full justify-start gap-3 text-gray-400 hover:text-white hover:bg-white/10">
+                    <Button variant="ghost" className="w-full justify-start gap-3 text-[#9AA0A6] hover:text-[#E8EAED] hover:bg-[#E8EAED]/10">
                         <ArrowLeft className="size-4" /> Back to Website
                     </Button>
                 </Link>

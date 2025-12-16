@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Rocket, Zap, Loader2 } from 'lucide-react';
+import { Rocket, Zap, Loader2, Map } from 'lucide-react';
 import { StaticRoadmaps } from './static-roadmaps';
 import { LiveRoadmaps } from './live-roadmaps';
 import { fetchLiveRoadmaps } from '@/app/actions/roadmaps';
+import { cn } from '@/lib/utils';
 
 export function RoadmapsView() {
     const [activeTab, setActiveTab] = useState<'static' | 'live'>('static');
@@ -17,8 +18,6 @@ export function RoadmapsView() {
         if (!liveData) {
             setLoading(true);
             try {
-                // Determine if we need to fetch. 
-                // We fetch if we don't have data yet.
                 const data = await fetchLiveRoadmaps();
                 setLiveData(data);
             } catch (error) {
@@ -30,32 +29,40 @@ export function RoadmapsView() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-bold flex items-center gap-3">
-                        <Rocket className="size-8 text-cyan-400" /> Learning Roadmaps
+        <div className="max-w-6xl mx-auto space-y-8 font-sans">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b-4 border-black pb-6">
+                <div className="flex flex-col">
+                    <h1 className="text-5xl font-black flex items-center gap-3 uppercase italic tracking-tighter text-[#E8EAED]">
+                        Roadmaps <span className="text-shatter-pink">_</span>
                     </h1>
-                    <p className="text-gray-400">
-                        Curated paths to help you master new technologies and domains.
+                    <p className="text-[#9AA0A6] font-bold uppercase tracking-widest mt-2">
+                        Master your craft. Follow the path.
                     </p>
                 </div>
 
-                {/* Tabs Switcher */}
-                <div className="flex p-1 bg-white/5 border border-white/10 rounded-lg">
+                {/* Tabs Switcher - Shatter Style */}
+                <div className="flex gap-2">
                     <Button
                         variant="ghost"
-                        size="sm"
                         onClick={() => setActiveTab('static')}
-                        className={`${activeTab === 'static' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white hover:bg-white/5'} transition-all`}
+                        className={cn(
+                            "h-12 px-6 border-4 border-black font-black uppercase tracking-widest rounded-none transition-all",
+                            activeTab === 'static'
+                                ? "bg-shatter-yellow text-black shadow-[4px_4px_0px_black] translate-x-[-2px] translate-y-[-2px]"
+                                : "bg-[#303134] text-[#9AA0A6] hover:bg-black hover:text-[#E8EAED]"
+                        )}
                     >
-                        Standard Roadmaps
+                        Standard
                     </Button>
                     <Button
                         variant="ghost"
-                        size="sm"
                         onClick={handleSwitchToLive}
-                        className={`${activeTab === 'live' ? 'bg-green-500/20 text-green-400' : 'text-gray-400 hover:text-white hover:bg-white/5'} transition-all`}
+                        className={cn(
+                            "h-12 px-6 border-4 border-black font-black uppercase tracking-widest rounded-none transition-all",
+                            activeTab === 'live'
+                                ? "bg-shatter-pink text-white shadow-[4px_4px_0px_black] translate-x-[-2px] translate-y-[-2px]"
+                                : "bg-[#303134] text-[#9AA0A6] hover:bg-black hover:text-[#E8EAED]"
+                        )}
                     >
                         <Zap className="size-4 mr-2" /> Live Events
                     </Button>
@@ -70,7 +77,7 @@ export function RoadmapsView() {
                     <>
                         {loading ? (
                             <div className="flex items-center justify-center h-64">
-                                <Loader2 className="size-8 text-green-400 animate-spin" />
+                                <Loader2 className="size-16 text-shatter-yellow animate-spin" />
                             </div>
                         ) : (
                             <LiveRoadmaps roadmaps={liveData || []} />

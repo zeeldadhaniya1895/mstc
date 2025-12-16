@@ -25,13 +25,25 @@ export default async function LeaderboardPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center p-3 rounded-full bg-cyan-500/10 text-cyan-400 ring-1 ring-cyan-500/50 mb-4">
-                    <Trophy className="size-8" />
+            <div className="flex flex-col items-center text-center space-y-6 mb-12">
+                {/* Icon Container - Shatter Style */}
+                <div className="relative inline-block">
+                    <div className="absolute inset-0 bg-shatter-yellow translate-x-2 translate-y-2 border-2 border-black" />
+                    <div className="relative bg-white border-2 border-black p-4 inline-flex items-center justify-center">
+                        <Trophy className="size-10 text-black" />
+                    </div>
                 </div>
-                <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Global Leaderboard</h1>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                    The top performers of the MSTC community. Complete checkpoints, help others, and attend events to climb the ranks.
+
+                {/* Main Title */}
+                <h1 className="text-center text-4xl md:text-7xl font-black uppercase italic tracking-tighter text-[#E8EAED] leading-[0.9]">
+                    Global <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8EAED] via-[#E8EAED] to-[#9AA0A6]">Leaderboard</span>
+                    <span className="text-shatter-pink text-4xl md:text-6xl">_</span>
+                </h1>
+
+                {/* Subtitle */}
+                <p className="text-center text-lg font-bold text-[#9AA0A6] max-w-2xl mx-auto uppercase tracking-wide">
+                    The top performers of the MSTC community. <span className="text-black bg-shatter-yellow px-1">Climb the ranks.</span>
                 </p>
             </div>
 

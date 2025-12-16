@@ -1,165 +1,148 @@
+import { auth } from "@/auth";
+import { FoldCard } from "@/components/ui/origami/fold-card";
+import { Activity, Trophy, Zap, Map, ArrowUpRight, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getUserStats, getUserRecentActivity } from "@/lib/data-fetching";
+import { redirect } from "next/navigation";
 
-import { auth } from '@/auth';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Trophy, Zap, Calendar } from 'lucide-react';
-import Link from 'next/link';
-import { db } from '@/lib/db';
-import { users, events } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
     const session = await auth();
 
-    // Fetch real user data
-    let userXp = 0;
-    let activeEventsCount = 0;
-    let totalSubmissions = 0;
-    let recentCheckpoints: any[] = [];
-
-    if (session?.user?.id) {
-        const dbUser = await db.query.users.findFirst({
-            where: eq(users.id, session.user.id),
-            with: {
-                registrations: {
-                    with: {
-                        checkpoints: {
-                            orderBy: (checkpoints: any, { desc }: any) => [desc(checkpoints.createdAt)],
-                            limit: 5
-                        },
-                        event: true
-                    }
-                }
-            }
-        }) as any;
-
-        if (dbUser) {
-            userXp = dbUser.xpPoints || 0;
-            activeEventsCount = dbUser.registrations.length;
-
-            // Flatten checkpoints for "Recent Activity"
-            // Note: This simple approach collects recent checks from all registrations
-            // For a perfect global "recent", we might need a separate query from 'checkpoints' table directly
-            // but this is efficient enough for a dashboard overview.
-            const allUserCheckpoints = dbUser.registrations.flatMap((reg: any) =>
-                reg.checkpoints.map((cp: any) => ({
-                    ...cp,
-                    eventName: reg.event.title,
-                    eventSlug: reg.event.slug
-                }))
-            ).sort((a: any, b: any) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
-
-            totalSubmissions = allUserCheckpoints.length;
-            recentCheckpoints = allUserCheckpoints.slice(0, 3);
-        }
+    if (!session?.user?.id) {
+        // Should be handled by middleware, but safe check
+        return redirect("/");
     }
 
-    // Fetch Live Event
-    const liveEvent = await db.query.events.findFirst({
-        where: eq(events.status, 'live')
-    });
+    const [stats, recentActivity] = await Promise.all([
+        getUserStats(session.user.id),
+        getUserRecentActivity(session.user.id)
+    ]);
+
+    // Inference for Batch/Roll
+    const displayRollNo = stats?.collegeId || 'PENDING';
+    const displayBatch = session.user.email?.match(/20\d{2}/)?.[0] || '2024';
 
     return (
-        <div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">Hello, {session?.user?.name || 'Student'}</h1>
-                <p className="text-gray-400">Welcome to your MSTC command center.</p>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 font-sans">
+            {/* Welcome Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 gap-4 border-b-4 border-black bg-[#303134]/50 backdrop-blur-sm p-4">
+                <div className="relative">
+                    <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter text-[#E8EAED] italic leading-[0.8] mb-2">
+                        DASHBOARD
+                        <span className="inline-block w-8 h-4 bg-shatter-pink ml-2 mb-2 skew-x-[-12deg] shadow-[4px_4px_0px_black]" />
+                    </h1>
+
+                    <div className="text-[#9AA0A6] font-mono text-sm font-bold uppercase tracking-[0.2em] flex flex-col md:flex-row md:items-center gap-2 items-start">
+                        <span className="flex items-center gap-2">
+                            OPERATIVE: <span className="bg-black text-[#E8EAED] px-1">{session?.user?.name || 'UNKNOWN'}</span>
+                        </span>
+                        <span className="hidden md:inline text-shatter-pink">//</span>
+                        <span className="flex items-center gap-2">
+                            STATUS: <span className="text-green-400 bg-green-900/30 px-1 border border-black">GREEN</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div className="hidden md:block">
+                    <div className="bg-shatter-yellow border-2 border-black px-6 py-2 transform skew-x-[-12deg] shadow-[4px_4px_0px_black]">
+                        <span className="text-black font-black text-xl italic tracking-widest transform skew-x-[12deg] inline-block">
+                            {new Date().toLocaleDateString('en-GB')}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div className="grid gap-3 grid-cols-2 md:grid-cols-3 md:gap-6 mb-8">
-                <Card className="p-4 md:p-6 bg-gradient-to-br from-purple-900/20 to-transparent border-purple-500/20">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                            <Trophy className="size-5 md:size-6 text-purple-400" />
-                        </div>
-                        <span className="text-xl md:text-2xl font-bold font-mono">{userXp}</span>
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-400">XP Points Earned</div>
-                </Card>
-
-                <Card className="p-4 md:p-6 bg-gradient-to-br from-blue-900/20 to-transparent border-blue-500/20">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <Zap className="size-5 md:size-6 text-blue-400" />
-                        </div>
-                        <span className="text-xl md:text-2xl font-bold font-mono">{activeEventsCount}</span>
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-400">Active Events</div>
-                </Card>
-
-                <Card className="p-4 md:p-6 bg-gradient-to-br from-green-900/20 to-transparent border-green-500/20 col-span-2 md:col-span-1">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-2 bg-green-500/10 rounded-lg">
-                            <Calendar className="size-5 md:size-6 text-green-400" />
-                        </div>
-                        <span className="text-xl md:text-2xl font-bold font-mono">{totalSubmissions}</span>
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-400">Total Submissions</div>
-                </Card>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title="Total XP" value={stats?.xpPoints || "0"} icon={Zap} accent="flame" />
+                <StatCard title="Global Rank" value={stats?.globalRank || "-"} icon={Trophy} accent="blue" />
+                <StatCard title="Events" value={stats?.eventsCount || "0"} icon={Map} accent="void" />
+                <StatCard title="Activity" value={stats?.activityLevel || "Low"} icon={Activity} accent="void" />
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-                {/* Active Event - Live Action */}
-                <Card className="p-4 md:p-6 bg-white/5 border-white/10">
-                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                        {liveEvent ? (
-                            <>
-                                <span className="relative flex h-3 w-3">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                </span>
-                                Live Now: {liveEvent.title}
-                            </>
-                        ) : (
-                            <span className="text-gray-400">No Live Events</span>
-                        )}
-                    </h3>
-
-                    <div className="space-y-4">
-                        {liveEvent ? (
-                            <>
-                                <div className="p-4 rounded-lg bg-black/20 border border-white/5">
-                                    <div className="text-sm text-gray-400 mb-1">Status</div>
-                                    <div className="font-semibold text-cyan-400">Accepting Submissions</div>
+            {/* Main Content Split */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left: Recent Activity Feed */}
+                <div className="lg:col-span-2 space-y-6">
+                    <h2 className="text-3xl font-black uppercase italic tracking-tighter text-[#E8EAED] flex items-center gap-2">
+                        Mission Log
+                    </h2>
+                    <FoldCard className="min-h-[300px] border-none shadow-none p-0 bg-transparent hover:translate-none hover:shadow-none">
+                        <div className="space-y-4">
+                            {recentActivity.length === 0 ? (
+                                <div className="p-8 border-4 border-black bg-[#303134] text-center text-[#9AA0A6] font-bold uppercase border-dashed">
+                                    No recent activity detected.
                                 </div>
+                            ) : (
+                                recentActivity.map((item, i) => (
+                                    <div key={item.id} className="group flex items-center gap-4 p-4 bg-[#303134] border-4 border-black shatter-shadow-sm hover:translate-x-1 transition-transform relative overflow-hidden">
+                                        {/* Hover Reveal Background */}
+                                        <div className="absolute inset-0 bg-shatter-yellow translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 z-0" />
 
-                                <Link href={`/dashboard/events/${liveEvent.slug}`}>
-                                    <Button className="w-full bg-white text-black hover:bg-gray-200">
-                                        Continue Working <ArrowRight className="ml-2 size-4" />
-                                    </Button>
-                                </Link>
-                            </>
-                        ) : (
-                            <div className="p-8 text-center text-gray-500 bg-white/5 rounded-lg border border-dashed border-white/10">
-                                Check back later for upcoming hackathons and events!
+                                        <div className={cn(
+                                            "relative z-10 p-3 border-2 border-black font-black",
+                                            i % 2 === 0 ? "bg-black text-white" : "bg-shatter-pink text-white"
+                                        )}>
+                                            0{i + 1}
+                                        </div>
+                                        <div className="flex-1 relative z-10">
+                                            <p className="text-[#E8EAED] font-black text-lg uppercase leading-none group-hover:text-black group-hover:underline truncate">{item.eventTitle || 'Unknown Event'}</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <p className="text-xs text-[#9AA0A6] font-mono font-bold group-hover:text-black uppercase">
+                                                    {item.status} // {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Unknown Date'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ArrowUpRight className="relative z-10 size-6 text-[#E8EAED] opacity-0 group-hover:opacity-100 group-hover:text-black transition-opacity" />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </FoldCard>
+                </div>
+
+                {/* Right: Profile Dossier Mini */}
+                <div>
+                    <h2 className="text-3xl font-black uppercase italic tracking-tighter text-[#E8EAED] mb-6">Operative Card</h2>
+                    <FoldCard accent="blue" className="text-center py-8 bg-[#303134] border-4 border-black shadow-[8px_8px_0px_black]">
+                        <div className="size-32 mx-auto bg-[#202124] border-4 border-black mb-6 overflow-hidden shadow-[4px_4px_0px_black] relative rotate-3 hover:rotate-0 transition-transform">
+                            {/* Avatar Placeholder */}
+                            <div className="w-full h-full flex items-center justify-center text-5xl font-black bg-shatter-grey text-[#E8EAED]">
+                                {session?.user?.name?.[0]}
                             </div>
-                        )}
-                    </div>
-                </Card>
+                        </div>
+                        <h3 className="text-3xl font-black text-[#E8EAED] uppercase italic tracking-tighter mb-1 truncate px-2">{session?.user?.name}</h3>
+                        <p className="text-sm text-[#9AA0A6] font-mono font-bold mb-6 truncate px-2">{session?.user?.email}</p>
 
-                {/* Recent Activity / Roadmap */}
-                <Card className="p-4 md:p-6 bg-white/5 border-white/10">
-                    <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
-                    <div className="space-y-4">
-                        {recentCheckpoints.length > 0 ? (
-                            recentCheckpoints.map((cp) => (
-                                <div key={cp.id} className="flex items-center gap-4 text-sm">
-                                    <div className={`size-2 rounded-full ${cp.isApproved ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                                    <div className="flex-1">
-                                        <span className="text-gray-300">Submitted Week {cp.weekNumber} Checkpoint for </span>
-                                        <span className="text-cyan-400 font-mono">{cp.eventName}</span>
-                                    </div>
-                                    <div className="text-gray-500 text-xs">
-                                        {new Date(cp.createdAt).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-gray-500 text-center py-4">No recent activity</div>
-                        )}
-                    </div>
-                </Card>
+                        <div className="grid grid-cols-2 gap-2 bg-black p-1 border-2 border-black mx-2">
+                            <div className="bg-shatter-yellow p-2 text-center text-xs font-black uppercase text-black">ROLL_NO</div>
+                            <div className="bg-[#303134] p-2 text-center text-xs font-bold text-[#E8EAED] border border-black truncate">{displayRollNo}</div>
+                            <div className="bg-shatter-yellow p-2 text-center text-xs font-black uppercase text-black">BATCH</div>
+                            <div className="bg-[#303134] p-2 text-center text-xs font-bold text-[#E8EAED] border border-black">{displayBatch}</div>
+                        </div>
+                    </FoldCard>
+                </div>
             </div>
         </div>
+    );
+}
+
+function StatCard({ title, value, icon: Icon, accent }: { title: string, value: string, icon: any, accent: 'flame' | 'blue' | 'void' }) {
+    return (
+        <FoldCard accent={accent} className="p-6 flex items-center justify-between group cursor-default h-32 hover:bg-black hover:text-[#E8EAED] transition-colors duration-300">
+            <div className="relative z-10">
+                <p className="text-xs font-black text-[#9AA0A6] uppercase tracking-widest mb-1 group-hover:text-shatter-yellow transition-colors">{title}</p>
+                <p className="text-4xl font-black text-[#E8EAED] italic group-hover:text-white transition-colors">{value}</p>
+            </div>
+            <div className={cn(
+                "relative z-10 p-3 border-4 border-black shadow-[4px_4px_0px_black] group-hover:shadow-[4px_4px_0px_white] group-hover:border-white transition-all transform group-hover:rotate-12",
+                accent === 'flame' ? "bg-shatter-pink text-white" :
+                    accent === 'blue' ? "bg-shatter-yellow text-black" : "bg-[#303134] text-[#E8EAED]"
+            )}>
+                <Icon className="size-6" />
+            </div>
+        </FoldCard>
     );
 }

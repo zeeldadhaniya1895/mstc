@@ -5,68 +5,119 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: #050505;
-  --color-foreground: #ffffff;
-  --color-neon-cyan: #00f3ff;
-  --color-neon-purple: #bd00ff;
-  --color-neon-pink: #ff0055;
+  --color-background: #202124;
+  /* Google Dark Background */
+  --color-foreground: #E8EAED;
+  /* Google Light Text */
+  --color-surface: #303134;
+  /* Google Surface */
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-shatter-yellow: #8AB4F8;
+  /* Visual: Google Blue (Replaces Yellow) */
+  --color-shatter-pink: #C58AF9;
+  /* Visual: Google Purple (Replaces Red/Pink) */
+  --color-shatter-purple: #81C995;
+  /* Visual: Google Green (Replaces Purple) */
+  --color-shatter-grey: #3C4043;
+  /* Google Dark Grey */
+  --color-shatter-blue: #FDD663;
+  /* Visual: Google Yellow (Swapped to Blue slot if needed, or kept as secondary) */
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: #202124;
+  --color-sidebar-foreground: #E8EAED;
+
+  --font-sans: "Anton", "Archivo Black", sans-serif;
+  /* Heavy Headings */
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius: 0px;
+}
+
+html {
+  font-size: 14px;
+  /* Global scale reduction (approx 87.5%) */
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: inherit;
+  font-family: var(--font-mono);
   overflow-x: hidden;
 }
 
-/* Noise Overlay */
-.bg-noise {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-style: italic;
 }
 
-/* Cyber Glass Recipe */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+/* SHATTER Utilities */
+.shatter-border {
+  border: 3px solid #000000;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border-radius: 24px;
-  transition: all 0.3s ease;
+.shatter-shadow {
+  box-shadow: 6px 6px 0px 0px #000000;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, #00f3ff 0%, #bd00ff 50%, #ff0055 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.shatter-shadow-sm {
+  box-shadow: 3px 3px 0px 0px #000000;
 }
 
-/* Hide Scrollbar Utility */
+.shatter-card {
+  background: var(--color-surface);
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px 0px #000000;
+  color: var(--color-foreground);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.shatter-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0px 0px var(--color-shatter-pink);
+}
+
+.clip-shard-right {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+}
+
+.clip-shard-left {
+  clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+/* Origami Backward Compatibility */
+.clip-cut-corner {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+}
+
+.text-origami-flame {
+  color: var(--color-shatter-pink);
+}
+
+.bg-origami-flame {
+  background-color: var(--color-shatter-pink);
+}
+
+.text-origami-blue {
+  color: var(--color-shatter-blue);
+}
+
+.bg-origami-blue {
+  background-color: var(--color-shatter-blue);
+}
+
+/* Scrollbar */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -74,4 +125,23 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Flip Card Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Safari support */
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }

@@ -1,189 +1,127 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+'use client';
+
+import { FoldCard } from '@/components/ui/origami/fold-card';
 import {
+    Database,
+    Sparkles,
     Code,
-    Smartphone,
-    Brain,
     Server,
+    Smartphone,
     Terminal,
     Cpu,
     Link as LinkIcon,
+    Brain,
     Layout,
-    Rocket,
     ArrowRight,
-    Sparkles,
-    Database
+    Star
 } from 'lucide-react';
 import Link from 'next/link';
 
+// Featured "Full Courses"
+const featuredRoadmaps = [
+    {
+        id: 'mern',
+        title: 'MERN Stack Full Course',
+        description: 'Complete mastery of MongoDB, Express, React, and Node.js. Build enterprise-grade applications.',
+        icon: Database,
+        accent: 'flame',
+        link: 'https://roadmap.sh/full-stack',
+        bg: 'bg-[#202124] text-[#E8EAED] hover:bg-shatter-yellow hover:text-black'
+    },
+    {
+        id: 'genai',
+        title: 'Generative AI Special',
+        description: 'Deep dive into LLMs, RAG, and AI engineering. The future of tech.',
+        icon: Sparkles,
+        accent: 'blue',
+        link: 'https://roadmap.sh/ai-data-scientist',
+        bg: 'bg-[#202124] text-[#E8EAED] hover:bg-shatter-pink hover:text-white'
+    }
+];
+
+// Standard Domain Tracks
+const domainRoadmaps = [
+    { id: 'frontend', title: 'Frontend Dev', icon: Code, link: 'https://roadmap.sh/frontend' },
+    { id: 'nodejs', title: 'NodeJS Backend', icon: Server, link: 'https://roadmap.sh/nodejs' },
+    { id: 'flutter', title: 'Flutter App', icon: Smartphone, link: 'https://roadmap.sh/flutter' },
+    { id: 'python', title: 'Python', icon: Terminal, link: 'https://roadmap.sh/python' },
+    { id: 'dsa', title: 'CP & DSA', icon: Cpu, link: 'https://roadmap.sh/cpp' },
+    { id: 'blockchain', title: 'Blockchain', icon: LinkIcon, link: 'https://roadmap.sh/blockchain' },
+    { id: 'ml-nlp', title: 'ML & NLP', icon: Brain, link: 'https://roadmap.sh/ai-data-scientist' },
+    { id: 'django', title: 'Django', icon: Layout, link: 'https://roadmap.sh/python' }
+];
+
 export function StaticRoadmaps() {
-    const bigRoadmaps = [
-        {
-            id: 'mern',
-            title: 'MERN Stack',
-            description: 'Master MongoDB, Express, React, and Node.js.',
-            icon: Database,
-            color: 'text-cyan-400',
-            bg: 'bg-cyan-500/10',
-            border: 'border-cyan-500/20',
-            href: 'https://msoc-website.vercel.app/events'
-        },
-        {
-            id: 'genai',
-            title: 'Generative AI',
-            description: 'Explore the frontier of AI generation and LLMs.',
-            icon: Sparkles,
-            color: 'text-purple-400',
-            bg: 'bg-purple-500/10',
-            border: 'border-purple-500/20',
-            href: 'https://msoc-website.vercel.app/events'
-        }
-    ];
-
-    const categoryRoadmaps = [
-        {
-            id: 'frontend',
-            title: 'HTML, CSS, JS & React',
-            description: 'The foundation of modern web development.',
-            icon: Code,
-            color: 'text-orange-400',
-            bg: 'bg-orange-500/10',
-            border: 'border-orange-500/20',
-            href: 'https://msoc-website.vercel.app/html-css-js-react'
-        },
-        {
-            id: 'nodejs',
-            title: 'NodeJS Backend',
-            description: 'Scalable server-side development with JavaScript.',
-            icon: Server,
-            color: 'text-green-400',
-            bg: 'bg-green-500/10',
-            border: 'border-green-500/20',
-            href: 'https://msoc-website.vercel.app/nodejs'
-        },
-        {
-            id: 'flutter',
-            title: 'Flutter App Dev',
-            description: 'Build native apps for mobile, web, and desktop.',
-            icon: Smartphone,
-            color: 'text-blue-400',
-            bg: 'bg-blue-500/10',
-            border: 'border-blue-500/20',
-            href: 'https://msoc-website.vercel.app/flutter'
-        },
-        {
-            id: 'python',
-            title: 'Python Programming',
-            description: 'Versatile programming for web, data, and scripts.',
-            icon: Terminal,
-            color: 'text-yellow-400',
-            bg: 'bg-yellow-500/10',
-            border: 'border-yellow-500/20',
-            href: 'https://msoc-website.vercel.app/python'
-        },
-        {
-            id: 'dsa',
-            title: 'CP & DSA',
-            description: 'Master algorithms and ace coding interviews.',
-            icon: Cpu,
-            color: 'text-red-400',
-            bg: 'bg-red-500/10',
-            border: 'border-red-500/20',
-            href: 'https://msoc-website.vercel.app/cp-dsa'
-        },
-        {
-            id: 'blockchain',
-            title: 'Blockchain & Web3',
-            description: 'Decentralized applications and smart contracts.',
-            icon: LinkIcon,
-            color: 'text-indigo-400',
-            bg: 'bg-indigo-500/10',
-            border: 'border-indigo-500/20',
-            href: 'https://msoc-website.vercel.app/blockchain'
-        },
-        {
-            id: 'ml-nlp',
-            title: 'ML & NLP',
-            description: 'Machine Learning and Natural Language Processing.',
-            icon: Brain,
-            color: 'text-pink-400',
-            bg: 'bg-pink-500/10',
-            border: 'border-pink-500/20',
-            href: 'https://msoc-website.vercel.app/ml-nlp'
-        },
-        {
-            id: 'django',
-            title: 'Django Framework',
-            description: 'The web framework for perfectionists with deadlines.',
-            icon: Layout,
-            color: 'text-emerald-400',
-            bg: 'bg-emerald-500/10',
-            border: 'border-emerald-500/20',
-            href: 'https://msoc-website.vercel.app/django'
-        }
-    ];
-
     return (
-        <div className="space-y-8 animate-in fade-in duration-300">
-            {/* Featured / Big Roadmaps */}
-            <div>
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <Sparkles className="size-5 text-yellow-400" /> Featured Paths
-                </h2>
-                <div className="grid gap-6 md:grid-cols-2">
-                    {bigRoadmaps.map((roadmap) => (
-                        <Card key={roadmap.id} className={`bg-gradient-to-br from-black to-white/5 border hover:border-opacity-50 transition-colors group ${roadmap.border}`}>
-                            <CardHeader>
-                                <div className={`size-12 rounded-lg flex items-center justify-center mb-4 ${roadmap.bg}`}>
-                                    <roadmap.icon className={`size-6 ${roadmap.color}`} />
-                                </div>
-                                <CardTitle className="text-2xl group-hover:text-white transition-colors">
-                                    {roadmap.title}
-                                </CardTitle>
-                                <CardDescription className="text-base">
-                                    {roadmap.description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="mt-auto">
-                                <Link href={roadmap.href} target="_blank">
-                                    <Button className={`w-full gap-2 ${roadmap.bg} ${roadmap.color} hover:text-white hover:bg-white/10 border border-white/5`}>
-                                        View Roadmap <ArrowRight className="size-4" />
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </div>
+        <div className="space-y-12 animate-in fade-in duration-500">
 
-            {/* Standard Category Roadmaps */}
-            <div>
-                <h2 className="text-xl font-bold mb-4">Domain Tracks</h2>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {categoryRoadmaps.map((roadmap) => (
-                        <Card key={roadmap.id} className={`bg-white/5 border-white/10 hover:border-white/20 transition-colors group flex flex-col`}>
-                            <CardHeader className="pb-3">
-                                <div className={`size-10 rounded-lg flex items-center justify-center mb-3 ${roadmap.bg}`}>
-                                    <roadmap.icon className={`size-5 ${roadmap.color}`} />
-                                </div>
-                                <CardTitle className="text-lg group-hover:text-white transition-colors">
-                                    {roadmap.title}
-                                </CardTitle>
-                                <CardDescription className="line-clamp-2 text-xs">
-                                    {roadmap.description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="mt-auto pt-0">
-                                <Link href={roadmap.href} target="_blank">
-                                    <Button variant="ghost" className="w-full justify-between text-gray-400 hover:text-white hover:bg-white/5 text-sm h-8 px-2">
-                                        Start Learning <ArrowRight className="size-3" />
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
+            {/* FEATURED SECTION */}
+            <section>
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter mb-6 flex items-center gap-3">
+                    <Star className="size-8 text-shatter-yellow fill-shatter-yellow" /> Specializations
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {featuredRoadmaps.map((item) => (
+                        <FoldCard
+                            key={item.id}
+                            accent={item.accent as any}
+                            className={`group relative overflow-hidden flex flex-col min-h-[280px] transition-all duration-300 ${item.bg}`}
+                        >
+                            <div className="absolute top-0 right-0 p-4 border-l-4 border-b-4 border-white/20">
+                                <item.icon className="size-10" />
+                            </div>
+
+                            <div className="mt-8 mb-4">
+                                <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4 leading-none">
+                                    {item.title}
+                                </h3>
+                                <div className="w-16 h-2 bg-white/30 skew-x-[-12deg]" />
+                            </div>
+
+                            <p className="text-lg font-bold opacity-80 mb-8 flex-1 max-w-md">
+                                {item.description}
+                            </p>
+
+                            <Link href={item.link} target="_blank" className="mt-auto">
+                                <button className="h-12 px-8 bg-[#303134] text-[#E8EAED] font-black uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2 border-4 border-black box-shadow-none">
+                                    Launch Course <ArrowRight className="size-5" />
+                                </button>
+                            </Link>
+                        </FoldCard>
                     ))}
                 </div>
-            </div>
+            </section>
+
+            {/* DOMAIN TRACKS SECTION */}
+            <section>
+                <h2 className="text-2xl font-black uppercase tracking-widest mb-6 text-[#9AA0A6]">
+                    Domain Tracks
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {domainRoadmaps.map((item) => (
+                        <FoldCard
+                            key={item.id}
+                            accent="void"
+                            className="group p-4 bg-[#303134] border-2 border-black hover:border-shatter-pink hover:translate-y-[-4px] transition-all"
+                        >
+                            <div className="flex flex-col h-full gap-4">
+                                <div className="size-10 bg-black flex items-center justify-center border-2 border-black group-hover:bg-shatter-pink group-hover:text-white transition-colors text-white">
+                                    <item.icon className="size-5" />
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg font-black uppercase leading-tight mb-1 group-hover:text-shatter-pink transition-colors text-[#E8EAED]">
+                                        {item.title}
+                                    </h3>
+                                    <Link href={item.link} target="_blank" className="text-xs font-bold text-[#9AA0A6] uppercase flex items-center gap-1 hover:text-[#E8EAED]">
+                                        View Track <ArrowRight className="size-3" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </FoldCard>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

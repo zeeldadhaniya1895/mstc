@@ -19,10 +19,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // Force fetch fresh role for existing sessions
                 // This runs in Node runtime (safe for DB)
                 try {
-                    const freshUser = await db.query.users.findFirst({
-                        where: eq(users.id, token.id as string),
-                        columns: { role: true }
-                    });
+                    const [freshUser] = await db.select({ role: users.role })
+                        .from(users)
+                        .where(eq(users.id, token.id as string))
+                        .limit(1);
+
                     if (freshUser) {
                         token.role = freshUser.role;
                     }

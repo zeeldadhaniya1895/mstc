@@ -19,6 +19,8 @@ import { Providers } from './providers';
 
 import { auth } from '@/auth';
 
+import { ShatterBackground } from '@/components/ui/shatter-background';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -29,8 +31,9 @@ export default async function RootLayout({
     <html lang="en" className="dark">
       <body
         suppressHydrationWarning
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-[#0f0f0f] text-white selection:bg-cyan-500/30 selection:text-cyan-200`}
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-[#202124] text-[#E8EAED] selection:bg-shatter-blue selection:text-black`}
       >
+        <ShatterBackground />
         <Providers session={session}>
           {children}
         </Providers>
@@ -39,3 +42,4 @@ export default async function RootLayout({
     </html>
   );
 }
+// Forced Rebuild for SessionProvider Context pass

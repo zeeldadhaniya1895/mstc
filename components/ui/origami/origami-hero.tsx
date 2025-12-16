@@ -1,0 +1,114 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+
+export function OrigamiHero() {
+    return (
+        <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#202124] pt-20">
+
+            {/* 1. Floating Shards (Decoration) */}
+            {Array.from({ length: 15 }).map((_, i) => (
+                <motion.div
+                    key={i}
+                    className={cn(
+                        "absolute opacity-20",
+                        i % 2 === 0 ? "bg-black" : "bg-shatter-yellow"
+                    )}
+                    initial={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        scale: 0,
+                        rotate: 0
+                    }}
+                    animate={{
+                        y: [0, Math.random() * 50 - 25],
+                        rotate: [0, 180],
+                        scale: [0.5, 1, 0.5]
+                    }}
+                    transition={{
+                        duration: 5 + Math.random() * 5,
+                        repeat: Infinity
+                    }}
+                    style={{
+                        width: Math.random() * 50 + 20,
+                        height: Math.random() * 50 + 20,
+                        clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
+                    }}
+                />
+            ))}
+
+            <div className="container relative z-10 flex flex-col items-center text-center px-4">
+
+                {/* 2. Top Label */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-shatter-yellow text-black font-black uppercase px-4 py-1 text-sm tracking-widest mb-6 rotate-2 shadow-[4px_4px_0px_#000]"
+                >
+                    Community // Innovation // Progress
+                </motion.div>
+
+                {/* 3. Massive Typography */}
+                <h1 className="text-5xl md:text-9xl font-black uppercase leading-[0.85] tracking-tighter mb-8 italic">
+                    <motion.div
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className="text-[#E8EAED] inline-block relative"
+                    >
+                        MSTC DAU <span className="text-shatter-pink text-4xl md:text-6xl align-top">_</span>
+                    </motion.div>
+                    <br />
+                    <motion.div
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8EAED] via-[#E8EAED] to-[#9AA0A6] drop-shadow-sm"
+                    >
+                        BUILDING
+                    </motion.div>
+                    <motion.div
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="relative inline-block"
+                    >
+                        THE FUTURE
+                        {/* Underline Decoration */}
+                        <div className="absolute -bottom-2 md:-bottom-4 left-0 w-full h-2 md:h-4 bg-shatter-yellow -z-10 -rotate-1" />
+                    </motion.div>
+                </h1>
+
+                {/* 4. Subtitle */}
+                <p className="text-lg md:text-2xl font-bold text-[#9AA0A6] max-w-2xl mb-12">
+                    We don't just write code. We <span className="bg-black text-[#E8EAED] px-2 italic">shatter expectations</span>. Join the revolution.
+                </p>
+
+                {/* 5. CTAs */}
+                <div className="flex flex-col md:flex-row gap-6">
+                    <Link href="/register">
+                        <Button className="h-16 px-10 bg-shatter-pink hover:bg-black text-white font-black text-xl uppercase tracking-widest shatter-shadow border-3 border-black rounded-none transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0px_#000] group">
+                            Become a Member <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                    </Link>
+                    <Link href="/dashboard/events">
+                        <Button variant="ghost" className="h-16 px-10 bg-[#303134] hover:bg-shatter-yellow text-[#E8EAED] hover:text-black font-black text-xl uppercase tracking-widest shatter-shadow border-3 border-black rounded-none transition-colors">
+                            View Events
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+
+            {/* 6. Bottom Decor */}
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-black flex overflow-hidden">
+                {Array.from({ length: 20 }).map((_, i) => (
+                    <div key={i} className="flex-none w-20 h-full bg-shatter-yellow border-r-2 border-black transform -skew-x-12 mx-2" />
+                ))}
+            </div>
+
+        </section>
+    );
+}

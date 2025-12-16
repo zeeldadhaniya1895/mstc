@@ -1,48 +1,24 @@
-
 'use client';
 
-import { useState } from 'react';
-import { Menu, Terminal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
+import { OrigamiSidebar } from '@/components/ui/origami/origami-sidebar';
+import { ShatterBackground } from '@/components/ui/shatter-background';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const [open, setOpen] = useState(false);
-
     return (
-        <div className="min-h-screen flex bg-[#0f0f0f] text-white font-sans">
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:flex w-64 border-r border-white/10 flex-col fixed h-full bg-[#141414] z-50">
-                <DashboardSidebar />
-            </aside>
+        <div className="min-h-screen text-[#E8EAED] font-sans relative bg-[#202124]">
 
-            {/* Mobile Header & Content */}
-            <div className="flex-1 flex flex-col md:ml-64">
-                {/* Mobile Header */}
-                <header className="h-16 border-b border-white/10 flex items-center px-4 md:hidden bg-[#141414] sticky top-0 z-40">
-                    <Sheet open={open} onOpenChange={setOpen}>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="mr-4 text-gray-400">
-                                <Menu className="size-6" />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="p-0 bg-[#141414] border-r border-white/10 w-72">
-                            <DashboardSidebar onNavigate={() => setOpen(false)} />
-                        </SheetContent>
-                    </Sheet>
+            {/* Animated Background Layer */}
+            <ShatterBackground />
 
-                    <div className="flex items-center gap-2">
-                        <Terminal className="text-cyan-400 size-5" />
-                        <span className="font-bold text-lg tracking-tight">MSTC Student</span>
-                    </div>
-                </header>
+            {/* The Origami Sidebar - Fixed Left */}
+            <OrigamiSidebar />
 
-                {/* Main Content Area */}
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+            {/* Main Content Area - Pushed right to accommodate the 300px wide sidebar */}
+            <main className="relative z-10 px-6 py-10 md:pl-[332px] min-h-screen">
+                <div className="max-w-7xl mx-auto">
                     {children}
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 }

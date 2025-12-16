@@ -1,4 +1,3 @@
-
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { users, registrations, events, checkpoints, teams } from '@/db/schema';
@@ -6,11 +5,12 @@ import { eq, desc, gt, and, count } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Calendar, Activity, Medal, Star, Github, Linkedin } from 'lucide-react';
+import { Trophy, Calendar, Activity, Star, Github, Linkedin, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { EditProfileDialog } from '@/components/profile/edit-profile-dialog';
+import { FoldCard } from '@/components/ui/origami/fold-card';
+import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,23 +20,18 @@ export default async function ProfilePage() {
 
     const userId = session.user.id;
 
-    // 1. Fetch User Data
     const user = await db.query.users.findFirst({
         where: eq(users.id, userId)
     });
 
     if (!user) return redirect('/login');
 
-    // 2. Calculate Rank
-    // Count users with strictly more XP than current user
-    // Note: This might be slow on huge datasets, but fine for now.
     const betterPlayers = await db.select({ count: count() })
         .from(users)
         .where(gt(users.xpPoints, user.xpPoints || 0));
 
     const rank = betterPlayers[0].count + 1;
 
-    // 3. Fetch Registered Events
     const myEvents = await db.select({
         event: events,
         reg: registrations,
@@ -48,7 +43,6 @@ export default async function ProfilePage() {
         .where(eq(registrations.userId, userId))
         .orderBy(desc(registrations.createdAt));
 
-    // 4. Fetch Recent Activity (Approved Checkpoints)
     const recentActivity = await db.select({
         checkpoint: checkpoints,
         event: events
@@ -64,128 +58,153 @@ export default async function ProfilePage() {
         .limit(5);
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
-            {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-900/40 to-cyan-900/20 rounded-2xl p-4 md:p-8 border border-white/10 flex flex-col md:flex-row items-center gap-4 md:gap-8 relative">
-                <div className="absolute top-4 right-4">
+        <div className="max-w-6xl mx-auto space-y-8 pb-12 font-sans text-[#E8EAED]">
+            {/* Header Section */}
+            <div className="relative border-4 border-black bg-[#303134] p-8 shatter-shadow">
+                <div className="absolute top-4 right-4 z-10">
                     <EditProfileDialog user={user} />
                 </div>
-                <Avatar className="size-24 md:size-32 border-4 border-cyan-500/30">
-                    <AvatarImage src={user.image || ''} />
-                    <AvatarFallback className="text-4xl font-bold bg-cyan-950 text-cyan-400">
-                        {user.name?.[0] || 'U'}
-                    </AvatarFallback>
-                </Avatar>
-                <div className="text-center md:text-left flex-1 space-y-2">
-                    <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-2 md:gap-4">
-                        <h1 className="text-2xl md:text-3xl font-bold">{user.name}</h1>
-                        <Badge variant="secondary" className="capitalize border-cyan-500/30 text-cyan-400">{user.role}</Badge>
-                    </div>
-                    <p className="text-gray-400 text-sm md:text-base">{user.email}</p>
-                    {user.bio && <p className="text-sm text-gray-300 max-w-lg italic">"{user.bio}"</p>}
 
-                    <div className="flex gap-4 justify-center md:justify-start pt-2">
-                        {user.githubId && (
-                            <a href={user.githubId.startsWith('http') ? user.githubId : `https://github.com/${user.githubId}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                                <Github className="size-5" />
-                            </a>
-                        )}
-                        {user.linkedinId && (
-                            <a href={user.linkedinId.startsWith('http') ? user.linkedinId : `https://linkedin.com/in/${user.linkedinId}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                                <Linkedin className="size-5" />
-                            </a>
-                        )}
+                <div className="flex flex-col md:flex-row items-start gap-8">
+                    {/* Avatar Block */}
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-shatter-yellow translate-x-3 translate-y-3 border-2 border-black" />
+                        <Avatar className="size-32 md:size-40 border-4 border-black rounded-none relative bg-[#202124]">
+                            <AvatarImage src={user.image || ''} />
+                            <AvatarFallback className="text-6xl font-black bg-[#202124] text-[#E8EAED] rounded-none">
+                                {user.name?.[0] || 'U'}
+                            </AvatarFallback>
+                        </Avatar>
                     </div>
 
-                    <p className="text-xs text-gray-500">Joined {new Date(user.createdAt!).toLocaleDateString()}</p>
-                </div>
-                {/* Quick Stats on Hero */}
-                <div className="flex w-full md:w-auto justify-around md:justify-start gap-4 md:gap-8 text-center bg-black/20 p-4 md:p-6 rounded-xl border border-white/5">
-                    <div>
-                        <div className="text-2xl md:text-3xl font-black text-cyan-400">{user.xpPoints}</div>
-                        <div className="text-[10px] md:text-xs uppercase tracking-wider text-gray-500 font-semibold">Total XP</div>
+                    <div className="flex-1 space-y-4">
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-[#E8EAED] leading-none mb-2">
+                                {user.name}
+                            </h1>
+                            <div className="flex flex-wrap gap-2 items-center">
+                                <span className="px-3 py-1 bg-black text-[#E8EAED] font-bold uppercase text-xs tracking-widest transform skew-x-[-12deg]">
+                                    {user.role}
+                                </span>
+                                <span className="font-mono font-bold text-[#9AA0A6] text-sm">
+                                     // {user.email}
+                                </span>
+                            </div>
+                        </div>
+
+                        {user.bio && (
+                            <p className="text-lg font-bold text-[#E8EAED] border-l-4 border-shatter-pink pl-4 italic">
+                                "{user.bio}"
+                            </p>
+                        )}
+
+                        <div className="flex gap-4 pt-2">
+                            {user.githubId && (
+                                <a href={user.githubId.startsWith('http') ? user.githubId : `https://github.com/${user.githubId}`} target="_blank" className="p-2 border-2 border-black hover:bg-black hover:text-[#E8EAED] transition-colors">
+                                    <Github className="size-5" />
+                                </a>
+                            )}
+                            {user.linkedinId && (
+                                <a href={user.linkedinId.startsWith('http') ? user.linkedinId : `https://linkedin.com/in/${user.linkedinId}`} target="_blank" className="p-2 border-2 border-black hover:bg-[#0077b5] hover:text-white hover:border-[#0077b5] transition-colors">
+                                    <Linkedin className="size-5" />
+                                </a>
+                            )}
+                        </div>
+
+                        <p className="text-xs font-black text-[#9AA0A6] uppercase tracking-widest">
+                            OPERATIVE SINCE {new Date(user.createdAt!).toLocaleDateString()}
+                        </p>
                     </div>
-                    <div>
-                        <div className="text-2xl md:text-3xl font-black text-yellow-400">#{rank}</div>
-                        <div className="text-[10px] md:text-xs uppercase tracking-wider text-gray-500 font-semibold">Global Rank</div>
+
+                    {/* Stats Block */}
+                    <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+                        <div className="bg-black text-white p-4 border-2 border-black min-w-[140px] text-center transform rotate-2">
+                            <div className="text-4xl font-black italic text-shatter-yellow">{user.xpPoints}</div>
+                            <div className="text-xs font-black uppercase tracking-widest">Total XP</div>
+                        </div>
+                        <div className="bg-[#202124] text-[#E8EAED] p-4 border-2 border-black min-w-[140px] text-center transform -rotate-2">
+                            <div className="text-4xl font-black italic">#{rank}</div>
+                            <div className="text-xs font-black uppercase tracking-widest text-[#9AA0A6]">Global Rank</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4 md:gap-8">
-                {/* Left Column: Stats & Events */}
-                <div className="md:col-span-2 space-y-8">
-                    {/* Events List */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold flex items-center gap-2">
-                            <Calendar className="size-5 text-cyan-400" /> My Events
-                        </h2>
-                        {myEvents.length === 0 ? (
-                            <Card className="bg-white/5 border-white/10 p-8 text-center text-gray-500">
-                                <p>You haven't joined any events yet.</p>
-                                <Link href="/dashboard/events">
-                                    <Button variant="link" className="text-cyan-400">Explore Events</Button>
+            <div className="grid md:grid-cols-3 gap-8">
+                {/* My Events */}
+                <div className="md:col-span-2 space-y-6">
+                    <h2 className="text-3xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-[#E8EAED]">
+                        <Calendar className="size-8 text-[#E8EAED]" /> My Events
+                    </h2>
+
+                    {myEvents.length === 0 ? (
+                        <div className="border-4 border-black border-dashed p-12 text-center bg-[#303134]">
+                            <p className="font-bold text-[#9AA0A6] mb-4 uppercase">No active missions.</p>
+                            <Link href="/dashboard/events">
+                                <Button className="bg-black text-white font-black uppercase tracking-widest hover:bg-shatter-pink">Explore Events</Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {myEvents.map(({ event, reg, team }) => (
+                                <Link key={event.id} href={`/dashboard/events/${event.slug}`}>
+                                    <FoldCard className="p-0 border-2 border-black hover:border-shatter-yellow transition-colors group">
+                                        <div className="flex items-stretch min-h-[100px]">
+                                            <div className="w-24 bg-black flex items-center justify-center text-[#E8EAED] font-black text-4xl p-4 shrink-0">
+                                                {event.title[0]}
+                                            </div>
+                                            <div className="flex-1 p-6 flex flex-col justify-center bg-[#303134]">
+                                                <h3 className="text-xl font-black uppercase italic tracking-tight group-hover:text-shatter-pink transition-colors text-[#E8EAED]">
+                                                    {event.title}
+                                                </h3>
+                                                <div className="flex items-center gap-3 mt-1">
+                                                    <span className="text-xs font-bold uppercase bg-black text-[#E8EAED] px-2 py-0.5">{event.type}</span>
+                                                    {team && <span className="text-xs font-bold text-[#9AA0A6]">TEAM: {team.name}</span>}
+                                                </div>
+                                            </div>
+                                            <div className={cn(
+                                                "w-32 flex items-center justify-center font-black uppercase tracking-widest text-xs border-l-2 border-black",
+                                                reg.status === 'accepted' ? "bg-green-900/30 text-green-400" : "bg-yellow-900/30 text-yellow-400"
+                                            )}>
+                                                {reg.status}
+                                            </div>
+                                        </div>
+                                    </FoldCard>
                                 </Link>
-                            </Card>
-                        ) : (
-                            <div className="grid gap-4">
-                                {myEvents.map(({ event, reg, team }) => (
-                                    <Link key={event.id} href={`/dashboard/events/${event.slug}`}>
-                                        <Card className="bg-white/5 border-white/10 hover:border-cyan-500/50 transition-colors group">
-                                            <CardContent className="p-4 flex items-center gap-4">
-                                                <div className="size-12 rounded-lg bg-gradient-to-br from-cyan-900 to-blue-900 flex items-center justify-center text-cyan-400 font-bold">
-                                                    {event.title[0]}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <h3 className="font-semibold group-hover:text-cyan-400 transition-colors">{event.title}</h3>
-                                                    <div className="flex gap-2 text-xs text-gray-400 mt-1">
-                                                        <Badge variant="outline" className="text-[10px] h-5 border-gray-600 px-1">{event.type}</Badge>
-                                                        {team && <span className="text-gray-500">Team: {team.name}</span>}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <Badge className={reg.status === 'accepted' ? 'bg-green-900/50 text-green-400 hover:bg-green-900/50' : 'bg-yellow-900/50 text-yellow-500 hover:bg-yellow-900/50'}>
-                                                        {reg.status}
-                                                    </Badge>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Right Column: Recent Activity */}
-                <div className="space-y-4">
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                        <Activity className="size-5 text-purple-400" /> Recent Activity
+                {/* Recent Activity */}
+                <div className="space-y-6">
+                    <h2 className="text-3xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-[#E8EAED]">
+                        <Activity className="size-8 text-shatter-pink" /> Activity
                     </h2>
-                    <Card className="bg-white/5 border-white/10 min-h-[300px]">
-                        <CardContent className="p-4 space-y-6">
-                            {recentActivity.length === 0 ? (
-                                <p className="text-center text-gray-500 py-8 text-sm">No recent activity. Start submitting checkpoints!</p>
-                            ) : (
-                                recentActivity.map((act) => (
-                                    <div key={act.checkpoint.id} className="relative pl-6 border-l border-white/10 pb-2 last:pb-0">
-                                        <div className="absolute -left-[5px] top-1 size-2.5 rounded-full bg-green-500 animate-pulse" />
-                                        <div className="text-sm font-medium text-white mb-1">
-                                            Completed Checkpoint
+
+                    <div className="relative border-l-4 border-black ml-4 space-y-8 py-4">
+                        {recentActivity.length === 0 ? (
+                            <p className="pl-6 text-[#9AA0A6] font-bold text-sm uppercase">No recent activity.</p>
+                        ) : (
+                            recentActivity.map((act, i) => (
+                                <div key={act.checkpoint.id} className="relative pl-8">
+                                    <div className="absolute -left-[10px] top-1 size-4 bg-shatter-yellow border-2 border-black rounded-none transform rotate-45" />
+
+                                    <div className="bg-[#303134] border-2 border-black p-4 shatter-shadow-sm hover:translate-x-1 transition-transform">
+                                        <div className="text-sm font-black uppercase text-[#E8EAED] mb-1">
+                                            Checkpoint Cleared
                                         </div>
-                                        <p className="text-xs text-gray-400 line-clamp-2">
-                                            {act.event.title} • Week {act.checkpoint.weekNumber}
+                                        <p className="text-xs font-bold text-[#9AA0A6] uppercase tracking-wide mb-2">
+                                            {act.event.title}
                                         </p>
-                                        <div className="mt-1 flex items-center gap-1 text-[10px] font-mono text-green-400">
-                                            <Star className="size-3 fill-green-400" /> +100 XP
+                                        <div className="inline-flex items-center gap-1 text-xs font-black text-black bg-shatter-yellow px-2 py-0.5 border border-black transform skew-x-[-12deg]">
+                                            <Star className="size-3 fill-black" /> +100 XP
                                         </div>
                                     </div>
-                                ))
-                            )}
-                        </CardContent>
-                    </Card>
-
-
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
