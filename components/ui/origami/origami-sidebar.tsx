@@ -35,7 +35,7 @@ export function OrigamiSidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
 
-    const isAdmin = true; // Use real RBAC in prod
+    const isAdmin = session?.user?.role && session.user.role !== 'student' && session.user.role !== 'member';
 
     return (
         <>
@@ -98,6 +98,10 @@ export function OrigamiSidebar() {
                             <p className="text-sm font-black text-[#E8EAED] uppercase truncate group-hover:text-black">{session?.user?.name || 'OPERATIVE'}</p>
                             <p className="text-xs text-[#9AA0A6] font-mono truncate group-hover:text-black">LEVEL_01</p>
                         </div>
+                    </Link>
+
+                    <Link href="/" className="w-full h-12 bg-black hover:bg-shatter-yellow hover:text-black text-white border-2 border-black font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shatter-shadow-sm mb-4">
+                        <ArrowRight className="size-4 rotate-180" /> Back to Website
                     </Link>
 
                     <button
