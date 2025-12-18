@@ -9,10 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
     const session = await auth();
+    console.log("AdminDashboard Session:", JSON.stringify(session, null, 2));
+
     const userRole = session?.user?.role;
     const adminRoles = ['convener', 'deputy_convener', 'core_member'];
 
+    console.log("AdminDashboard Check:", { userRole, adminRoles, allowed: userRole && adminRoles.includes(userRole) });
+
     if (!userRole || !adminRoles.includes(userRole)) {
+        console.log("AdminDashboard: Access Denied. Redirecting to /dashboard");
         redirect('/dashboard');
     }
 
