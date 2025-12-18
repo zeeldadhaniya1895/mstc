@@ -36,13 +36,9 @@ export function OrigamiSidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
 
-<<<<<<< HEAD
     const userRole = session?.user?.role;
     const adminRoles = ['convener', 'deputy_convener', 'core_member'];
     const isAdmin = userRole ? adminRoles.includes(userRole) : false;
-=======
-    const isAdmin = session?.user?.role && session.user.role !== 'student' && session.user.role !== 'member';
->>>>>>> 1e61f08304928d5562db766842035a8f4792a5e3
 
     return (
         <>
@@ -107,13 +103,8 @@ export function OrigamiSidebar() {
                         </div>
                     </Link>
 
-<<<<<<< HEAD
-                    <Link href="/" className="mb-2 w-full h-10 bg-[#303134] hover:bg-shatter-blue hover:text-white text-[#E8EAED] border-2 border-black font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shatter-shadow-sm block text-sm">
-                        <ArrowLeft className="size-4" /> Back to Home
-=======
                     <Link href="/" className="w-full h-12 bg-black hover:bg-shatter-yellow hover:text-black text-white border-2 border-black font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shatter-shadow-sm mb-4">
-                        <ArrowRight className="size-4 rotate-180" /> Back to Website
->>>>>>> 1e61f08304928d5562db766842035a8f4792a5e3
+                        <ArrowLeft className="size-4" /> Back to Website
                     </Link>
 
                     <button
@@ -123,62 +114,63 @@ export function OrigamiSidebar() {
                         <LogOut className="size-4" /> Sign Out
                     </button>
                 </div>
-            </aside>
+            </aside >
 
             {/* Mobile Trigger */}
-            <div className="md:hidden fixed top-4 right-4 z-50">
+            < div className="md:hidden fixed top-4 right-4 z-50" >
                 <button
                     onClick={() => setMobileOpen(!mobileOpen)}
                     className="size-12 bg-shatter-yellow text-black border-2 border-black shatter-shadow-sm flex items-center justify-center active:translate-y-1 transition-transform"
                 >
                     {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
                 </button>
-            </div>
+            </div >
 
             {/* Mobile Menu */}
-            {mobileOpen && (
-                <div className="fixed inset-0 z-40 bg-[#202124] flex flex-col p-8 space-y-6 animate-in slide-in-from-right font-sans">
-                    <h2 className="text-5xl font-black text-[#E8EAED] uppercase italic mb-8 border-b-4 border-shatter-yellow inline-block self-start">
-                        MENU
-                    </h2>
-                    <div className="space-y-4">
-                        {menuItems.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-4 text-3xl font-black text-[#E8EAED] uppercase hover:text-shatter-pink transition-colors"
-                            >
-                                <item.icon className="size-8" />
-                                {item.name}
+            {
+                mobileOpen && (
+                    <div className="fixed inset-0 z-40 bg-[#202124] flex flex-col p-8 space-y-6 animate-in slide-in-from-right font-sans">
+                        <h2 className="text-5xl font-black text-[#E8EAED] uppercase italic mb-8 border-b-4 border-shatter-yellow inline-block self-start">
+                            MENU
+                        </h2>
+                        <div className="space-y-4">
+                            {menuItems.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setMobileOpen(false)}
+                                    className="flex items-center gap-4 text-3xl font-black text-[#E8EAED] uppercase hover:text-shatter-pink transition-colors"
+                                >
+                                    <item.icon className="size-8" />
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
+
+                        <div className="mt-auto space-y-4">
+                            <Link href="/dashboard/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 bg-[#303134] p-3 border-2 border-black active:bg-shatter-yellow transition-colors group">
+                                <div className="size-12 bg-black text-white flex items-center justify-center font-black border border-black group-active:bg-white group-active:text-black transition-colors text-xl">
+                                    {session?.user?.name?.[0] || 'U'}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <p className="text-lg font-black text-[#E8EAED] uppercase truncate group-active:text-black">{session?.user?.name || 'OPERATIVE'}</p>
+                                    <p className="text-sm text-[#9AA0A6] font-mono truncate group-active:text-black">LEVEL_01</p>
+                                </div>
                             </Link>
-                        ))}
-                    </div>
 
-                    <div className="mt-auto space-y-4">
-                        <Link href="/dashboard/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 bg-[#303134] p-3 border-2 border-black active:bg-shatter-yellow transition-colors group">
-                            <div className="size-12 bg-black text-white flex items-center justify-center font-black border border-black group-active:bg-white group-active:text-black transition-colors text-xl">
-                                {session?.user?.name?.[0] || 'U'}
-                            </div>
-                            <div className="overflow-hidden">
-                                <p className="text-lg font-black text-[#E8EAED] uppercase truncate group-active:text-black">{session?.user?.name || 'OPERATIVE'}</p>
-                                <p className="text-sm text-[#9AA0A6] font-mono truncate group-active:text-black">LEVEL_01</p>
-                            </div>
-                        </Link>
+                            <Link href="/" onClick={() => setMobileOpen(false)} className="w-full h-14 bg-[#303134] text-[#E8EAED] font-black uppercase tracking-widest text-lg border-2 border-black active:bg-shatter-blue active:text-white transition-colors flex items-center justify-center gap-2">
+                                <ArrowLeft className="size-5" /> Back to Home
+                            </Link>
 
-                        <Link href="/" onClick={() => setMobileOpen(false)} className="w-full h-14 bg-[#303134] text-[#E8EAED] font-black uppercase tracking-widest text-lg border-2 border-black active:bg-shatter-blue active:text-white transition-colors flex items-center justify-center gap-2">
-                            <ArrowLeft className="size-5" /> Back to Home
-                        </Link>
-
-                        <button
-                            onClick={() => signOut()}
-                            className="w-full h-16 bg-black text-white font-black uppercase tracking-widest text-xl border-2 border-[#303134] active:bg-shatter-pink active:border-black transition-colors"
-                        >
-                            Log Out
-                        </button>
-                    </div>
-                </div >
-            )
+                            <button
+                                onClick={() => signOut()}
+                                className="w-full h-16 bg-black text-white font-black uppercase tracking-widest text-xl border-2 border-[#303134] active:bg-shatter-pink active:border-black transition-colors"
+                            >
+                                Log Out
+                            </button>
+                        </div>
+                    </div >
+                )
             }
         </>
     );
