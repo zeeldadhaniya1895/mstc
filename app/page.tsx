@@ -4,7 +4,7 @@ import { OrigamiNavbar } from '@/components/ui/origami/origami-navbar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Code2, Cpu, Globe, Terminal, Smartphone, Brain, Sparkles } from 'lucide-react';
+import { ArrowRight, Code2, Cpu, Globe, Terminal, Smartphone, Brain, Sparkles, Github, Linkedin, Instagram, Twitter, Facebook } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PolyCard } from '@/components/ui/origami/poly-card';
@@ -29,6 +29,15 @@ const domains = [
   { name: 'CP / DSA', icon: Code2 },
   { name: 'Game Dev', icon: Cpu },
   { name: 'Cyber Sec', icon: Terminal },
+  { name: 'Blockchain', icon: Sparkles },
+];
+
+const SOCIALS = [
+  { name: "LinkedIn", url: "https://in.linkedin.com/company/microsoft-student-technical-club-da-iict", icon: <Linkedin className="size-5" /> },
+  { name: "Instagram", url: "https://www.instagram.com/mstc_daiict/", icon: <Instagram className="size-5" /> },
+  { name: "Twitter (X)", url: "https://x.com/mstc_daiict", icon: <Twitter className="size-5" /> },
+  { name: "Facebook", url: "https://www.facebook.com/mstcatdaiict/", icon: <Facebook className="size-5" /> },
+  { name: "GitHub", url: "https://github.com/MSTC-DA-IICT", icon: <Github className="size-5" /> }
 ];
 
 export default function Home() {
@@ -106,6 +115,34 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      {/* Connect Section */}
+      <div className="text-center space-y-12 py-20 border-t-4 border-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-shatter-pattern opacity-5" />
+        <div className="relative z-10 space-y-12">
+          <div>
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic text-[#E8EAED] tracking-tighter mb-4">
+              Connect With Us
+            </h2>
+            <p className="text-xl text-[#9AA0A6] max-w-2xl mx-auto font-bold uppercase tracking-widest">Stay connected with MSTC DAU Gandhinagar and be part of our growing community</p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-6">
+            {SOCIALS.map((social, idx) => (
+              <a
+                key={idx}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-6 py-4 bg-black border-2 border-shatter-yellow text-[#E8EAED] hover:bg-shatter-yellow hover:text-black transition-all duration-300 font-bold uppercase tracking-wider transform hover:-rotate-2 hover:shadow-[8px_8px_0px_white]"
+              >
+                {social.icon}
+                <span>{social.name}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

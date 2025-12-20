@@ -14,7 +14,7 @@ import Image from 'next/image';
 const links = [
     { name: 'Home', href: '/' },
     { name: 'Events', href: '/dashboard/events' },
-    { name: 'Timeline', href: '#timeline' },
+    { name: 'Timeline', href: '/#timeline' },
     { name: 'Team', href: '/team' },
     { name: 'About', href: '/about' },
 ];
