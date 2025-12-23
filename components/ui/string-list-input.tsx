@@ -50,6 +50,7 @@ export function StringListInput({ value, onChange, placeholder = 'Add item', lab
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    onBlur={handleAdd} // Auto-add on blur
                     placeholder={placeholder}
                     className="bg-white/5"
                 />
