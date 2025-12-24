@@ -38,13 +38,13 @@ function LoginContent() {
                     <Chrome className="mr-2 size-4 text-red-400" /> Continue with Google
                 </Button>
             </div>
-
+{/* 
             <div className="mt-8 text-center text-sm text-gray-500">
                 Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors">
                     Join Club
                 </Link>
-            </div>
+            </div> */}
         </Card>
     );
 }
