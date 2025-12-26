@@ -97,9 +97,7 @@ export default async function EventsPage() {
 
                                 <div className="h-1 w-12 bg-black my-4" />
 
-                                <p className="text-sm font-bold text-[#9AA0A6] mb-6 flex-1 line-clamp-3">
-                                    {event.description || "Join the ultimate challenge. Prove your worth."}
-                                </p>
+
 
                                 <Link href={`/dashboard/events/${event.slug}`} className="w-full">
                                     <Button className="w-full h-12 bg-[#202124] text-[#E8EAED] border-4 border-black font-black uppercase hover:bg-black hover:text-white transition-colors flex items-center justify-between px-6 rounded-none">
