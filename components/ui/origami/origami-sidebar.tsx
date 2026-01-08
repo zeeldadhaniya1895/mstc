@@ -37,7 +37,7 @@ export function OrigamiSidebar() {
     const { data: session } = useSession();
 
     const userRole = session?.user?.role;
-    const adminRoles = ['convener', 'deputy_convener', 'core_member'];
+    const adminRoles = ['convener', 'deputy_convener', 'core_member', 'member'];
     const isAdmin = userRole ? adminRoles.includes(userRole) : false;
 
     return (
@@ -134,17 +134,20 @@ export function OrigamiSidebar() {
                             MENU
                         </h2>
                         <div className="space-y-4">
-                            {menuItems.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    onClick={() => setMobileOpen(false)}
-                                    className="flex items-center gap-4 text-3xl font-black text-[#E8EAED] uppercase hover:text-shatter-pink transition-colors"
-                                >
-                                    <item.icon className="size-8" />
-                                    {item.name}
-                                </Link>
-                            ))}
+                            {menuItems.map((item) => {
+                                if (item.adminOnly && !isAdmin) return null;
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center gap-4 text-3xl font-black text-[#E8EAED] uppercase hover:text-shatter-pink transition-colors"
+                                    >
+                                        <item.icon className="size-8" />
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                         </div>
 
                         <div className="mt-auto space-y-4">

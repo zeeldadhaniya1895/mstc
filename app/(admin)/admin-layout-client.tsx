@@ -20,7 +20,7 @@ const navItems = [
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
-export function AdminLayoutClient({ children }: { children: ReactNode }) {
+export function AdminLayoutClient({ children, userRole }: { children: ReactNode, userRole?: string }) {
     const pathname = usePathname();
 
     return (
@@ -49,6 +49,13 @@ export function AdminLayoutClient({ children }: { children: ReactNode }) {
 
                 <div className="flex-1 p-4 space-y-3 overflow-y-auto">
                     {navItems.map((item) => {
+                        // Filter logic for 'member' role
+                        const role = (userRole || 'student') as string;
+                        if (role === 'member') {
+                            const allowed = ['/admin', '/admin/events', '/admin/legacy'];
+                            if (!allowed.includes(item.href)) return null;
+                        }
+
                         const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
                         const Icon = item.icon;
 

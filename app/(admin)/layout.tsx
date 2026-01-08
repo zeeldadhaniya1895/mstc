@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
     const userRole = session?.user?.role;
-    const adminRoles = ['convener', 'deputy_convener', 'core_member'];
+    const adminRoles = ['convener', 'deputy_convener', 'core_member', 'member'];
 
     if (!userRole || !adminRoles.includes(userRole)) {
         // If the user thinks they should be here, let's show them why they aren't.
@@ -44,5 +44,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         );
     }
 
-    return <AdminLayoutClient>{children}</AdminLayoutClient>;
+    return <AdminLayoutClient userRole={userRole}>{children}</AdminLayoutClient>;
 }

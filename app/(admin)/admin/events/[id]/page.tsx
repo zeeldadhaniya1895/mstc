@@ -16,6 +16,11 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
     // Await params for Next.js 15+ compatibility
     const { id } = await params;
 
+    // Get session and role for permission checks
+    const session = await (await import('@/auth')).auth();
+    const userRole = session?.user?.role || '';
+    const isHighLevelAdmin = ['convener', 'deputy_convener', 'core_member'].includes(userRole as any);
+
     const event = await db.query.events.findFirst({
         where: eq(events.id, id)
     });
@@ -65,11 +70,13 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
                             <Trophy className="size-4" /> Awards
                         </Button>
                     </Link>
-                    <Link href={`/admin/events/${id}/registrations`}>
-                        <Button className="gap-2 bg-cyan-600 hover:bg-cyan-700">
-                            Manage Participants
-                        </Button>
-                    </Link>
+                    {isHighLevelAdmin && (
+                        <Link href={`/admin/events/${id}/registrations`}>
+                            <Button className="gap-2 bg-cyan-600 hover:bg-cyan-700">
+                                Manage Participants
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -165,7 +172,9 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
                                             {row.reg.createdAt ? new Date(row.reg.createdAt).toLocaleDateString() : 'N/A'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <DeleteParticipantButton registrationId={row.reg.id} name={row.user?.name || 'Unknown'} />
+                                            {isHighLevelAdmin && (
+                                                <DeleteParticipantButton registrationId={row.reg.id} name={row.user?.name || 'Unknown'} />
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -176,7 +185,9 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
             </div>
 
             {/* Event Settings Section */}
-            <EditEventSettings event={event} />
+            {isHighLevelAdmin && (
+                <EditEventSettings event={event} />
+            )}
         </div>
     );
 }
